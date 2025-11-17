@@ -3,6 +3,8 @@ import { deleteWishlistItemStep } from "./steps/delete-wishlist-item"
 import { useQueryGraphStep } from "@medusajs/medusa/core-flows"
 import { validateItemInWishlistStep } from "./steps/validate-item-in-wishlist"
 import { validateWishlistExistsStep } from "./steps/validate-wishlist-exists"
+import { InferTypeOf } from "@medusajs/framework/types"
+import { Wishlist } from "../modules/wishlist/models/wishlist"
 
 type DeleteWishlistItemWorkflowInput = {
   wishlist_item_id: string
@@ -21,11 +23,11 @@ export const deleteWishlistItemWorkflow = createWorkflow(
     })
     
     validateWishlistExistsStep({
-      wishlists
+      wishlists: wishlists as InferTypeOf<typeof Wishlist>[]
     })
 
     validateItemInWishlistStep({
-      wishlist: wishlists[0],
+      wishlist: wishlists[0] as InferTypeOf<typeof Wishlist>,
       wishlist_item_id: input.wishlist_item_id
     })
 
@@ -41,7 +43,7 @@ export const deleteWishlistItemWorkflow = createWorkflow(
     }).config({ name: "refetch-wishlist" })
 
     return new WorkflowResponse({
-      wishlist: updatedWishlists[0]
+      wishlist: updatedWishlists[0] as any
     })
   }
 )

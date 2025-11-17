@@ -4,6 +4,8 @@ import { validateWishlistSalesChannelStep } from "./steps/validate-wishlist-sale
 import { createWishlistItemStep } from "./steps/create-wishlist-item"
 import { validateVariantWishlistStep } from "./steps/validate-variant-wishlist"
 import { validateWishlistExistsStep } from "./steps/validate-wishlist-exists"
+import { InferTypeOf } from "@medusajs/framework/types"
+import { Wishlist } from "../modules/wishlist/models/wishlist"
 
 type CreateWishlistItemWorkflowInput = {
   variant_id: string
@@ -23,11 +25,11 @@ export const createWishlistItemWorkflow = createWorkflow(
     })
 
     validateWishlistExistsStep({
-      wishlists
+      wishlists: wishlists as InferTypeOf<typeof Wishlist>[]
     })
 
     validateWishlistSalesChannelStep({
-      wishlist: wishlists[0],
+      wishlist: wishlists[0] as InferTypeOf<typeof Wishlist>,
       sales_channel_id: input.sales_channel_id
     })
 
@@ -35,7 +37,7 @@ export const createWishlistItemWorkflow = createWorkflow(
     validateVariantWishlistStep({
       variant_id: input.variant_id,
       sales_channel_id: input.sales_channel_id,
-      wishlist: wishlists[0]
+      wishlist: wishlists[0] as InferTypeOf<typeof Wishlist>
     })
 
     createWishlistItemStep({
@@ -53,7 +55,7 @@ export const createWishlistItemWorkflow = createWorkflow(
     }).config({ name: "refetch-wishlist" })
 
     return new WorkflowResponse({
-      wishlist: updatedWishlists[0],
+      wishlist: updatedWishlists[0] as any,
     })
   }
 )
