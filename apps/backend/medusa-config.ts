@@ -19,6 +19,9 @@ module.exports = defineConfig({
   },
   modules: [
     {
+      resolve: "./src/modules/wishlist",
+    },
+    {
       resolve: "@medusajs/medusa/auth",
       dependencies: [Modules.CACHE, ContainerRegistrationKeys.LOGGER],
       options: {
@@ -54,6 +57,29 @@ module.exports = defineConfig({
       resolve: "@medusajs/medusa/event-bus-redis",
       options: { 
         redisUrl: process.env.REDIS_URL,
+      },
+    },
+    {
+      resolve: "@medusajs/medusa/file",
+      options: {
+        providers: [
+          {
+            resolve: "@medusajs/medusa/file-s3",
+            id: "s3",
+            options: {
+              file_url: process.env.MINIO_FILE_URL,
+              access_key_id: process.env.MINIO_ACCESS_KEY,
+              secret_access_key: process.env.MINIO_SECRET_KEY,
+              region: process.env.MINIO_REGION,
+              bucket: process.env.MINIO_BUCKET,
+              endpoint: process.env.MINIO_ENDPOINT,
+              additional_client_config: {
+                // Required for MinIO/non-AWS S3 providers to use path-style URLs
+                forcePathStyle: true,
+              },
+            },
+          },
+        ],
       },
     }
   ]

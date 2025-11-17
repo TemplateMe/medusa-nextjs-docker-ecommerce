@@ -1,0 +1,57 @@
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: medusa_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: medusa-store
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - medusa_network
+
+  # Redis
+  redis:
+    image: redis:7-alpine
+    container_name: medusa_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    networks:
+      - medusa_network
+
+  # MinIO Object Storage
+  # S3-compatible object storage for file uploads, images, etc.
+  minio:
+    image: minio/minio:RELEASE.2024-10-29T16-01-48Z
+    container_name: medusa_minio
+    restart: unless-stopped
+    command: server /data --console-address ":9002"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    ports:
+      - "9001:9000"  # MinIO API
+      - "9002:9002"  # MinIO Console (Web UI)
+    volumes:
+      - minio_data:/data
+    networks:
+      - medusa_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+
+volumes:
+  postgres_data:
+  minio_data:
+
+networks:
+  medusa_network:
+    driver: bridge

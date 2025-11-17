@@ -25,6 +25,29 @@ services:
     networks:
       - medusa_network
 
+  # MinIO Object Storage
+  # S3-compatible object storage for file uploads, images, etc.
+  minio:
+    image: minio/minio:RELEASE.2024-10-29T16-01-48Z
+    container_name: medusa_minio
+    restart: unless-stopped
+    command: server /data --console-address ":9002"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    ports:
+      - "9001:9000"  # MinIO API
+      - "9002:9002"  # MinIO Console (Web UI)
+    volumes:
+      - minio_data:/data
+    networks:
+      - medusa_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+
   # Medusa Server
   # This service runs the Medusa backend application
   # and the admin dashboard.
@@ -37,12 +60,18 @@ services:
     depends_on:
       - postgres
       - redis
+      - minio
     ports:
       - "9000:9000"
     environment:
       - NODE_ENV=development
       - DATABASE_URL=postgres://postgres:postgres@postgres:5432/medusa-store
       - REDIS_URL=redis://redis:6379
+      - MINIO_ENDPOINT=http://minio:9000
+      - MINIO_ACCESS_KEY=minioadmin
+      - MINIO_SECRET_KEY=minioadmin
+      - MINIO_BUCKET=medusa-uploads
+      - MINIO_REGION=eu-central-1
     env_file:
       - ./apps/backend/.env
     volumes:
@@ -79,6 +108,7 @@ services:
 
 volumes:
   postgres_data:
+  minio_data:
 
 networks:
   medusa_network:

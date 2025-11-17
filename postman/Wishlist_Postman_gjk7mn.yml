@@ -1,0 +1,128 @@
+openapi: 3.0.0
+info:
+  title: Wishlist Plugin
+  version: 1.0.0
+servers:
+  - url: http://{{medusa_backend_url}}
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+paths:
+  /store/customers/me/wishlists:
+    get:
+      tags:
+        - default
+      summary: Get Customer Wishlist
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: x-publishable-api-key
+          in: header
+          schema:
+            type: string
+          example: '{{MEDUSA_PUBLISHABLE_API_KEY}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+    post:
+      tags:
+        - default
+      summary: Create Customer Wishlist
+      requestBody:
+        content: {}
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: x-publishable-api-key
+          in: header
+          schema:
+            type: string
+          example: '{{MEDUSA_PUBLISHABLE_API_KEY}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /store/customers/me/wishlists/items:
+    post:
+      tags:
+        - default
+      summary: Add Wishlist Item
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                variant_id: variant_01JEZMDJJS8K6SWYB3F049J6M5
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: x-publishable-api-key
+          in: header
+          schema:
+            type: string
+          example: '{{MEDUSA_PUBLISHABLE_API_KEY}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /store/customers/me/wishlists/share:
+    post:
+      tags:
+        - default
+      summary: Get Share Token
+      requestBody:
+        content: {}
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: x-publishable-api-key
+          in: header
+          schema:
+            type: string
+          example: '{{MEDUSA_PUBLISHABLE_API_KEY}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /store/wishlists/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ3aXNobGlzdF9pZCI6IjAxSko0MkU4VjhNWFA1VENUUFk5Q1dNVlFBIiwiaWF0IjoxNzM3NDUyMjc3LCJleHAiOjE3Mzc1Mzg2Nzd9.GBEnSIWeOXinJK86j80XcmQPFXt2BM4OXLLkPtsRhfg:
+    get:
+      tags:
+        - default
+      summary: Get Wishlist by Token
+      parameters:
+        - name: x-publishable-api-key
+          in: header
+          schema:
+            type: string
+          example: '{{MEDUSA_PUBLISHABLE_API_KEY}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /store/customers/me/wishlists/items/01JJ42RMZX0CJV8C3WJ2HA7TYW:
+    delete:
+      tags:
+        - default
+      summary: Delete Item from Wishlist
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: x-publishable-api-key
+          in: header
+          schema:
+            type: string
+          example: '{{MEDUSA_PUBLISHABLE_API_KEY}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
