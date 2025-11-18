@@ -26,7 +26,7 @@ export async function GET(
 
   const { data } = await query.graph({
     entity: "wishlist",
-    fields: ["*", "items.*", "items.product_variant.*"],
+    fields: ["*", "items.*", "items.product_variant.*", "items.product_variant.product.*"],
     filters: {
       id: decodedToken.wishlist_id
     }

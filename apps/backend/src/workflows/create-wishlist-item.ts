@@ -48,7 +48,7 @@ export const createWishlistItemWorkflow = createWorkflow(
     // refetch wishlist
     const { data: updatedWishlists } = useQueryGraphStep({
       entity: "wishlist",
-      fields: ["*", "items.*", "items.product_variant.*"],
+      fields: ["*", "items.*", "items.product_variant.*", "items.product_variant.product.*"],
       filters: {
         id: wishlists[0].id
       },

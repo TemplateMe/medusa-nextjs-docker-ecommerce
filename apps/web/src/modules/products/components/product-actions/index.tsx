@@ -12,11 +12,15 @@ import { useEffect, useMemo, useRef, useState } from "react"
 import ProductPrice from "../product-price"
 import MobileActions from "./mobile-actions"
 import { useRouter } from "next/navigation"
+import AddToWishlist from "./add-to-wishlist"
+import { Wishlist } from "@lib/data/wishlist"
 
 type ProductActionsProps = {
   product: HttpTypes.StoreProduct
   region: HttpTypes.StoreRegion
   disabled?: boolean
+  wishlist?: Wishlist | null
+  isAuthenticated?: boolean
 }
 
 const optionsAsKeymap = (
@@ -31,6 +35,8 @@ const optionsAsKeymap = (
 export default function ProductActions({
   product,
   disabled,
+  wishlist = null,
+  isAuthenticated = false,
 }: ProductActionsProps) {
   const router = useRouter()
   const pathname = usePathname()
@@ -47,6 +53,9 @@ export default function ProductActions({
       setOptions(variantOptions ?? {})
     }
   }, [product.variants])
+
+  // Get the first variant as default for wishlist (even if out of stock)
+  const defaultVariant = product.variants?.[0]
 
   const selectedVariant = useMemo(() => {
     if (!product.variants || product.variants.length === 0) {
@@ -182,6 +191,16 @@ export default function ProductActions({
             ? "Out of stock"
             : "Add to cart"}
         </Button>
+        
+        {(selectedVariant || defaultVariant) && (
+          <AddToWishlist
+            variantId={(selectedVariant || defaultVariant)!.id}
+            wishlist={wishlist}
+            isAuthenticated={isAuthenticated}
+            countryCode={countryCode}
+          />
+        )}
+        
         <MobileActions
           product={product}
           variant={selectedVariant}
