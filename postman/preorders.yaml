@@ -1,0 +1,120 @@
+openapi: 3.0.0
+info:
+  title: Pre-order
+  version: 1.0.0
+servers:
+  - url: http://{{backend_url}}
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+tags:
+  - name: Admin
+  - name: Admin > Auth
+  - name: Store
+paths:
+  /auth/user/emailpass:
+    post:
+      tags:
+        - Admin > Auth
+      summary: Login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                email: admin@medusajs.com
+                password: supersecret
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /admin/variants/{id}/preorders:
+    post:
+      tags:
+        - Admin
+      summary: Upsert Product Variant Preorder Config
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                available_date: '2025-07-30T21:00:00.000Z'
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          schema:
+            type: string
+          required: true
+          example: variant_01K097J3012YJ0CMZRM7WNGMGN
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+    delete:
+      tags:
+        - Admin
+      summary: Disable Product Variant Preorder
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          schema:
+            type: string
+          required: true
+          example: variant_01K097J3012YJ0CMZRM7WNGMGN
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /admin/orders/{id}/preorders:
+    get:
+      tags:
+        - Admin
+      summary: Get Order's Preorders
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          schema:
+            type: string
+          required: true
+          example: order_01K09JW14GYSYXDNMVTMCGZAND
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /store/carts/{cart_id}/complete-preorder:
+    post:
+      tags:
+        - Store
+      summary: Complete Cart with Preorders
+      requestBody:
+        content: {}
+      parameters:
+        - name: x-publishable-api-key
+          in: header
+          schema:
+            type: string
+          example: '{{PUBLISHABLE_API_KEY}}'
+        - name: cart_id
+          in: path
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}

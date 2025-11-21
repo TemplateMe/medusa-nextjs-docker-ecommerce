@@ -22,7 +22,7 @@ import { getRegion } from "./regions"
  */
 export async function retrieveCart(cartId?: string, fields?: string) {
   const id = cartId || (await getCartId())
-  fields ??= "*items, *region, *items.product, *items.variant, *items.thumbnail, *items.metadata, +items.total, *promotions, +shipping_methods.name"
+  fields ??= "*items, *region, *items.product, *items.variant, *items.variant.preorder_variant, *items.thumbnail, *items.metadata, +items.total, *promotions, +shipping_methods.name"
 
   if (!id) {
     return null
@@ -384,7 +384,33 @@ export async function setAddresses(currentState: unknown, formData: FormData) {
 }
 
 /**
+ * Check if a cart contains preorder items
+ */
+async function cartHasPreorderItems(cartId: string): Promise<boolean> {
+  try {
+    const cart = await retrieveCart(cartId)
+    
+    if (!cart || !cart.items || cart.items.length === 0) {
+      return false
+    }
+
+    return cart.items.some((item: any) => {
+      const variant = item.variant
+      return (
+        variant?.preorder_variant &&
+        variant.preorder_variant.status === "enabled" &&
+        new Date(variant.preorder_variant.available_date) > new Date()
+      )
+    })
+  } catch (error) {
+    console.error("Failed to check preorder items:", error)
+    return false
+  }
+}
+
+/**
  * Places an order for a cart. If no cart ID is provided, it will use the cart ID from the cookies.
+ * Automatically detects and handles carts with preorder items.
  * @param cartId - optional - The ID of the cart to place an order for.
  * @returns The cart object if the order was successful, or null if not.
  */
@@ -399,14 +425,38 @@ export async function placeOrder(cartId?: string) {
     ...(await getAuthHeaders()),
   }
 
-  const cartRes = await sdk.store.cart
-    .complete(id, {}, headers)
-    .then(async (cartRes) => {
-      const cartCacheTag = await getCacheTag("carts")
-      revalidateTag(cartCacheTag)
-      return cartRes
-    })
-    .catch(medusaError)
+  // Check if cart has preorder items
+  const hasPreorders = await cartHasPreorderItems(id)
+
+  let cartRes
+
+  if (hasPreorders) {
+    // Use preorder completion endpoint
+    cartRes = await sdk.client
+      .fetch<{ type: string; order: any; cart?: any }>(
+        `/store/carts/${id}/compleate-preorder`,
+        {
+          method: "POST",
+          headers,
+        }
+      )
+      .then(async (res) => {
+        const cartCacheTag = await getCacheTag("carts")
+        revalidateTag(cartCacheTag)
+        return res
+      })
+      .catch(medusaError)
+  } else {
+    // Use standard completion
+    cartRes = await sdk.store.cart
+      .complete(id, {}, headers)
+      .then(async (cartRes) => {
+        const cartCacheTag = await getCacheTag("carts")
+        revalidateTag(cartCacheTag)
+        return cartRes
+      })
+      .catch(medusaError)
+  }
 
   if (cartRes?.type === "order") {
     const countryCode =
@@ -419,7 +469,7 @@ export async function placeOrder(cartId?: string) {
     redirect(`/${countryCode}/order/${cartRes?.order.id}/confirmed`)
   }
 
-  return cartRes.cart
+  return (cartRes as any).cart
 }
 
 /**

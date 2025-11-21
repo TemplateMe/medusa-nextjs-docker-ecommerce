@@ -28,6 +28,7 @@
         ]
     }
 2.6 - replace the bucketname with your buckets name for example mines medusa-uploads and save it
+2.6.1 - go to Anonymous and Add Access Rule with prefix / and Access readonly
 2.7 update the minio env variables for the server.
 3 - run the server itself using this docker command:
     docker-compose -f docker-compose.server.yml up --build -d

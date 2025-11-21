@@ -14,6 +14,8 @@ import MobileActions from "./mobile-actions"
 import { useRouter } from "next/navigation"
 import AddToWishlist from "./add-to-wishlist"
 import { Wishlist } from "@lib/data/wishlist"
+import { isPreorderVariant, getPreorderAvailableDate } from "@lib/util/preorder"
+import PreorderBadge from "../preorder-badge"
 
 type ProductActionsProps = {
   product: HttpTypes.StoreProduct
@@ -101,8 +103,22 @@ export default function ProductActions({
     router.replace(pathname + "?" + params.toString())
   }, [selectedVariant, isValidVariant])
 
+  // Check if the selected variant is a preorder
+  const isPreorder = useMemo(() => {
+    return selectedVariant ? isPreorderVariant(selectedVariant) : false
+  }, [selectedVariant])
+
+  const preorderDate = useMemo(() => {
+    return selectedVariant ? getPreorderAvailableDate(selectedVariant) : null
+  }, [selectedVariant])
+
   // check if the selected variant is in stock
   const inStock = useMemo(() => {
+    // Preorder items are always "available"
+    if (isPreorder) {
+      return true
+    }
+
     // If we don't manage inventory, we can always add to cart
     if (selectedVariant && !selectedVariant.manage_inventory) {
       return true
@@ -123,7 +139,7 @@ export default function ProductActions({
 
     // Otherwise, we can't add to cart
     return false
-  }, [selectedVariant])
+  }, [selectedVariant, isPreorder])
 
   const actionsRef = useRef<HTMLDivElement>(null)
 
@@ -171,6 +187,10 @@ export default function ProductActions({
 
         <ProductPrice product={product} variant={selectedVariant} />
 
+        {isPreorder && preorderDate && (
+          <PreorderBadge availableDate={preorderDate} />
+        )}
+
         <Button
           onClick={handleAddToCart}
           disabled={
@@ -189,6 +209,8 @@ export default function ProductActions({
             ? "Select variant"
             : !inStock || !isValidVariant
             ? "Out of stock"
+            : isPreorder
+            ? "Pre-order now"
             : "Add to cart"}
         </Button>
         

@@ -5,8 +5,7 @@ checkEnvVariables()
 /**
  * Medusa Cloud-related environment variables
  */
-const S3_HOSTNAME = process.env.MEDUSA_CLOUD_S3_HOSTNAME
-const S3_PATHNAME = process.env.MEDUSA_CLOUD_S3_PATHNAME
+const isDev = process.env.NODE_ENV === 'development';
 
 /**
  * @type {import('next').NextConfig}
@@ -27,19 +26,17 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
   images: {
+    unoptimized: isDev, // Unoptimize images if in development
     remotePatterns: [
       {
         protocol: "http",
         hostname: "localhost",
       },
       {
-        protocol: "http",
-        hostname: "minio",
-      },
-      {
-        protocol: "http",
-        hostname: "localhost",
-        port: "9001",
+        protocol: 'http',
+        hostname: 'localhost',
+        port: '9001',
+        pathname: '/medusa-uploads/**',
       },
       {
         protocol: "https",
@@ -53,15 +50,6 @@ const nextConfig = {
         protocol: "https",
         hostname: "medusa-server-testing.s3.us-east-1.amazonaws.com",
       },
-      ...(S3_HOSTNAME && S3_PATHNAME
-        ? [
-            {
-              protocol: "https",
-              hostname: S3_HOSTNAME,
-              pathname: S3_PATHNAME,
-            },
-          ]
-        : []),
     ],
   },
 }
