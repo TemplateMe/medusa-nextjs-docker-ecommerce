@@ -1,0 +1,50 @@
+openapi: 3.0.3
+info:
+  title: Product Feed API
+  version: "1.0.0"
+  description: |
+    OpenAPI specification generated from the Postman collection "Product Feed".
+    Includes a single endpoint to fetch a product feed.
+servers:
+  - url: "{BACKEND_URL}"
+    description: Base URL of the Medusa backend
+    variables:
+      BACKEND_URL:
+        default: "http://localhost:9000"
+        description: Default local development server
+paths:
+  /product-feed:
+    get:
+      summary: Get Product Feed
+      description: Retrieve the product feed with optional currency and country parameters.
+      parameters:
+        - in: query
+          name: currency_code
+          required: false
+          schema:
+            type: string
+          description: ISO 4217 currency code (e.g., "eur").
+        - in: query
+          name: country_code
+          required: false
+          schema:
+            type: string
+          description: ISO 3166-1 alpha-2 country code (e.g., "dk").
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                description: Product feed payload (structure not specified in the source collection).
+                additionalProperties: true
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      tags:
+        - Product Feed
+tags:
+  - name: Product Feed
+    description: Endpoints related to product feed retrieval.
