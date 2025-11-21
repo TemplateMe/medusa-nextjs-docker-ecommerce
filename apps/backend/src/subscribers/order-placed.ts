@@ -5,10 +5,10 @@ import type {
 import { Modules } from "@medusajs/framework/utils"
 
 /**
- * Subscriber that sends an admin notification when an order is canceled
- * This helps admins track order cancellations and take necessary actions
+ * Subscriber that sends an admin notification when an order is placed
+ * This notification will appear in the Medusa Admin dashboard notification panel
  */
-export default async function orderCanceledHandler({
+export default async function orderPlacedHandler({
   event: { data },
   container,
 }: SubscriberArgs<{ id: string }>) {
@@ -17,7 +17,7 @@ export default async function orderCanceledHandler({
   try {
     const notificationModuleService = container.resolve(Modules.NOTIFICATION)
 
-    // Get order details
+    // Get order details for the notification
     const query = container.resolve("query")
     const { data: orders } = await query.graph({
       entity: "order",
@@ -38,7 +38,7 @@ export default async function orderCanceledHandler({
     const order = orders?.[0] as any
 
     if (!order) {
-      logger.warn(`Order not found for cancellation notification: ${data.id}`)
+      logger.warn(`Order not found for notification: ${data.id}`)
       return
     }
 
@@ -54,17 +54,18 @@ export default async function orderCanceledHandler({
       channel: "feed",
       template: "admin-ui",
       data: {
-        title: `Order #${order.display_id || order.id} Canceled`,
-        description: `Order for ${formattedTotal} by ${order.customer?.first_name || ""} ${order.customer?.last_name || order.email} was canceled`,
+        title: `New Order #${order.display_id || order.id}`,
+        description: `${order.customer?.first_name || ""} ${order.customer?.last_name || order.email} placed an order for ${formattedTotal}`,
       },
     })
 
-    logger.info(`Order canceled notification sent for order: ${order.display_id || order.id}`)
+    logger.info(`Order placed notification sent for order: ${order.display_id || order.id}`)
   } catch (error: any) {
-    logger.error(`Failed to send order canceled notification: ${error?.message || error}`)
+    logger.error(`Failed to send order placed notification: ${error?.message || error}`)
   }
 }
 
 export const config: SubscriberConfig = {
-  event: "order.canceled",
+  event: "order.placed",
 }
+

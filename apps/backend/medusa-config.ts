@@ -25,6 +25,20 @@ module.exports = defineConfig({
       resolve: "./src/modules/preorder",
     },
     {
+      resolve: "@medusajs/medusa/notification",
+      options: {
+        providers: [
+          {
+            resolve: "@medusajs/medusa/notification-local",
+            id: "local",
+            options: {
+              channels: ["feed", "email"],
+            },
+          },
+        ],
+      },
+    },
+    {
       resolve: "@medusajs/medusa/auth",
       dependencies: [Modules.CACHE, ContainerRegistrationKeys.LOGGER],
       options: {

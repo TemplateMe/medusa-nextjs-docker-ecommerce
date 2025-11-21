@@ -1,7 +1,8 @@
-import { createWorkflow, when, WorkflowResponse } from "@medusajs/framework/workflows-sdk"
+import { createWorkflow, when, WorkflowResponse, transform } from "@medusajs/framework/workflows-sdk"
 import { completeCartWorkflow, useQueryGraphStep } from "@medusajs/medusa/core-flows"
 import { retrievePreorderItemIdsStep, RetrievePreorderItemIdsStepInput } from "./steps/retrieve-preorder-items"
 import { createPreordersStep } from "./steps/create-preorders"
+import { emitPreorderEventsStep } from "./steps/emit-preorder-events"
 
 type WorkflowInput = {
   cart_id: string
@@ -35,9 +36,18 @@ export const completeCartPreorderWorkflow = createWorkflow(
       preorderItemIds
     }, (data) => data.preorderItemIds.length > 0)
     .then(() => {
-      createPreordersStep({
+      const preorders = createPreordersStep({
         preorder_variant_ids: preorderItemIds,
         order_id: id
+      })
+
+      // Extract preorder IDs and emit events
+      const preorderIds = transform({ preorders }, (data) => {
+        return data.preorders.map((p: any) => p.id)
+      })
+
+      emitPreorderEventsStep({
+        preorder_ids: preorderIds
       })
     })
 
@@ -59,7 +69,7 @@ export const completeCartPreorderWorkflow = createWorkflow(
     }).config({ name: "retrieve-order" });
 
     return new WorkflowResponse({
-      order: Array.isArray(orders) ? orders[0] : orders,
+      order: (Array.isArray(orders) ? orders[0] : orders) as any,
     });
   }
 )
