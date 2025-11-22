@@ -48,9 +48,32 @@ services:
       timeout: 20s
       retries: 3
 
+  # Meilisearch
+  # Fast, typo-tolerant search engine for product search
+  meilisearch:
+    image: getmeili/meilisearch:v1.11
+    container_name: medusa_meilisearch
+    restart: unless-stopped
+    environment:
+      MEILI_MASTER_KEY: mK8vQ7nX2pL9wR4tY6hU3jN5mB8cD1fG
+      MEILI_ENV: production
+    ports:
+      - "7700:7700"
+    volumes:
+      - meilisearch_data:/meili_data
+    networks:
+      - medusa_network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--spider", "http://localhost:7700/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
 volumes:
   postgres_data:
   minio_data:
+  meilisearch_data:
 
 networks:
   medusa_network:
