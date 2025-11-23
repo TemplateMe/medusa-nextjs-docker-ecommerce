@@ -7,8 +7,10 @@ import ProductTabs from "@modules/products/components/product-tabs"
 import RelatedProducts from "@modules/products/components/related-products"
 import ProductInfo from "@modules/products/templates/product-info"
 import SkeletonRelatedProducts from "@modules/skeletons/templates/skeleton-related-products"
+import ReviewsSection from "@modules/products/components/reviews-section"
 import { notFound } from "next/navigation"
 import { HttpTypes } from "@medusajs/types"
+import { getProductReviews, getProductRatingStats } from "@lib/data/reviews"
 
 import ProductActionsWrapper from "./product-actions-wrapper"
 
@@ -19,7 +21,7 @@ type ProductTemplateProps = {
   images: HttpTypes.StoreProductImage[]
 }
 
-const ProductTemplate: React.FC<ProductTemplateProps> = ({
+const ProductTemplate: React.FC<ProductTemplateProps> = async ({
   product,
   region,
   countryCode,
@@ -28,6 +30,10 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
   if (!product || !product.id) {
     return notFound()
   }
+
+  // Fetch reviews and rating stats
+  const reviews = await getProductReviews(product.id)
+  const ratingStats = await getProductRatingStats(product.id)
 
   return (
     <>
@@ -56,6 +62,16 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
             <ProductActionsWrapper id={product.id} region={region} />
           </Suspense>
         </div>
+      </div>
+      <div
+        className="content-container my-16 small:my-32"
+        data-testid="reviews-container"
+      >
+        <ReviewsSection
+          productId={product.id}
+          reviews={reviews}
+          ratingStats={ratingStats}
+        />
       </div>
       <div
         className="content-container my-16 small:my-32"

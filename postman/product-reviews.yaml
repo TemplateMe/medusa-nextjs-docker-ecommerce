@@ -1,0 +1,176 @@
+openapi: 3.0.0
+info:
+  title: Product Reviews
+  version: 1.0.0
+servers:
+  - url: http://{{backend_url}}
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+tags:
+  - name: Admin
+  - name: Admin > Auth
+  - name: Store
+  - name: Store > Auth
+paths:
+  /auth/user/emailpass:
+    post:
+      tags:
+        - Admin > Auth
+      summary: Login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                email: admin@gmail.com
+                password: supersecret
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /admin/reviews:
+    get:
+      tags:
+        - Admin
+      summary: List Reviews
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /admin/reviews/status:
+    post:
+      tags:
+        - Admin
+      summary: Update Status
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                ids: []
+                status: approved
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /auth/customer/emailpass:
+    post:
+      tags:
+        - Store > Auth
+      summary: Get JWT / Login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                email: customer@gmail.com
+                password: supersecret
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /store/customers:
+    post:
+      tags:
+        - Store > Auth
+      summary: Register Customer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                email: customer@gmail.com
+                first_name: Customer
+                last_name: Example
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: x-publishable-api-key
+          in: header
+          schema:
+            type: string
+          example: '{{MEDUSA_PUBLISHABLE_API_KEY}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /auth/customer/emailpass/register:
+    post:
+      tags:
+        - Store > Auth
+      summary: Get Register Token
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                email: customer@gmail.com
+                password: supersecret
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /store/reviews:
+    post:
+      tags:
+        - Store
+      summary: Create Review
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                product_id: prod_01JP8277651C3BFKZ7SW4S6S5Z
+                title: Really hated it
+                content: The fabric made me itchy
+                rating: 1
+                first_name: Jane
+                last_name: Smith
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: x-publishable-api-key
+          in: header
+          schema:
+            type: string
+          example: '{{MEDUSA_PUBLISHABLE_API_KEY}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /store/products/prod_01JP5DXPHP1EPMKG6J8RMBT0BE/reviews:
+    get:
+      tags:
+        - Store
+      summary: Get Product's Reviews
+      parameters:
+        - name: x-publishable-api-key
+          in: header
+          schema:
+            type: string
+          example: '{{MEDUSA_PUBLISHABLE_API_KEY}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}

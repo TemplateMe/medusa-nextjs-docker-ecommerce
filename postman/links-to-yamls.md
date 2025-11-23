@@ -5,3 +5,4 @@ Preorders plugin documentation: https://github.com/medusajs/examples/tree/main/p
 Product feed plugin documentation: https://github.com/medusajs/examples/tree/main/product-feed
 Search plugin documentation: https://github.com/medusajs/examples/tree/main/meilisearch-integration
 Invoice Generator plugin documentation: https://github.com/medusajs/examples/tree/main/invoice-generator
+Product Reviews plugin documentation: https://github.com/medusajs/examples/tree/main/product-reviews
