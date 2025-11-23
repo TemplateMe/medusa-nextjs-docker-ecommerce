@@ -6,6 +6,7 @@ import {
 import { PostStoreCreateWishlistItem } from "./store/customers/me/wishlists/items/validators"
 import { UpsertPreorderVariantSchema } from "./admin/variants/[id]/preorders/route"
 import { z } from 'zod';
+import { PostInvoiceConfgSchema } from "./admin/invoice-config/route"
   
 export default defineMiddlewares({
   routes: [
@@ -24,14 +25,21 @@ export default defineMiddlewares({
       ],
     },
     {
-    matcher: "/product-feed",
-    methods: ["GET"],
-    middlewares: [
-      validateAndTransformQuery(z.object({
-        currency_code: z.string(),
-        country_code: z.string(),
-      }), {})
-    ]
-  }
+      matcher: "/product-feed",
+      methods: ["GET"],
+      middlewares: [
+        validateAndTransformQuery(z.object({
+          currency_code: z.string(),
+          country_code: z.string(),
+        }), {})
+      ]
+    },
+    {
+      matcher: "/admin/invoice-config",
+      methods: ["POST"],
+      middlewares: [
+        validateAndTransformBody(PostInvoiceConfgSchema)
+      ]
+    }
   ],
 })

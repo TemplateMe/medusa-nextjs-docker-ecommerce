@@ -64,6 +64,9 @@ module.exports = defineConfig({
       }
     },
     {
+      resolve: "./src/modules/invoice-generator",
+    },
+    {
       resolve: "@medusajs/medusa/auth",
       dependencies: [Modules.CACHE, ContainerRegistrationKeys.LOGGER],
       options: {

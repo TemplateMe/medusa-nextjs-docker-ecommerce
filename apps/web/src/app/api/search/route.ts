@@ -12,8 +12,8 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Use the internal Docker network URL
-    const backendUrl = process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL || "http://medusa:9000"
+    // Use the internal Docker network URL for server-side requests
+    const backendUrl = process.env.MEDUSA_BACKEND_URL || "http://medusa:9000"
     const publishableKey = process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY
     
     if (!publishableKey) {
