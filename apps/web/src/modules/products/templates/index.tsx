@@ -8,6 +8,7 @@ import RelatedProducts from "@modules/products/components/related-products"
 import ProductInfo from "@modules/products/templates/product-info"
 import SkeletonRelatedProducts from "@modules/skeletons/templates/skeleton-related-products"
 import ReviewsSection from "@modules/products/components/reviews-section"
+import ProductBundlesSection from "@modules/products/components/product-bundles-section"
 import { notFound } from "next/navigation"
 import { HttpTypes } from "@medusajs/types"
 import { getProductReviews, getProductRatingStats } from "@lib/data/reviews"
@@ -72,6 +73,14 @@ const ProductTemplate: React.FC<ProductTemplateProps> = async ({
           reviews={reviews}
           ratingStats={ratingStats}
         />
+      </div>
+      <div
+        className="content-container my-16 small:my-32"
+        data-testid="bundles-container"
+      >
+        <Suspense fallback={null}>
+          <ProductBundlesSection productId={product.id} region={region} />
+        </Suspense>
       </div>
       <div
         className="content-container my-16 small:my-32"

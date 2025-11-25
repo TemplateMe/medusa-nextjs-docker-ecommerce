@@ -204,11 +204,11 @@ const InvoiceConfigPage = () => {
                 if (url.startsWith("http://") || url.startsWith("https://")) {
                   // Extract just the filename from the full URL
                   const filename = url.split("/").pop() || ""
-                  return `${fileUrl}/${bucket}/${filename}`
+                  return `${fileUrl}/${filename}`
                 }
                 
                 // Otherwise it's just a filename, construct full URL
-                return `${fileUrl}/${bucket}/${url}`
+                return `${fileUrl}/${url}`
               }
 
               return (

@@ -70,6 +70,9 @@ module.exports = defineConfig({
       resolve: "./src/modules/product-review",
     },
     {
+      resolve: "./src/modules/bundled-product",
+    },
+    {
       resolve: "@medusajs/medusa/auth",
       dependencies: [Modules.CACHE, ContainerRegistrationKeys.LOGGER],
       options: {

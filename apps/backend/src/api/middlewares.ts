@@ -4,6 +4,7 @@ import {
   validateAndTransformBody,
   validateAndTransformQuery,
 } from "@medusajs/framework/http"
+import { createFindParams } from "@medusajs/medusa/api/utils/validators";
 import { PostStoreCreateWishlistItem } from "./store/customers/me/wishlists/items/validators"
 import { UpsertPreorderVariantSchema } from "./admin/variants/[id]/preorders/route"
 import { z } from 'zod';
@@ -12,6 +13,8 @@ import { PostAdminUpdateReviewsStatusSchema } from "./admin/reviews/status/route
 import { PostStoreReviewSchema } from "./store/reviews/route"
 import { GetStoreReviewsSchema } from "./store/products/[id]/reviews/route"
 import { GetAdminReviewsSchema } from "./admin/reviews/route"
+import { PostCartsBundledLineItemsSchema } from "./store/carts/[id]/line-item-bundles/route"
+import { PostBundledProductsSchema } from "./admin/bundled-products/route";
   
 export default defineMiddlewares({
   routes: [
@@ -91,6 +94,37 @@ export default defineMiddlewares({
       middlewares: [
         validateAndTransformBody(PostAdminUpdateReviewsStatusSchema)
       ]
+    },
+    {
+      matcher: "/admin/bundled-products",
+      methods: ["POST"],
+      middlewares: [
+        validateAndTransformBody(PostBundledProductsSchema),
+      ],
+    },
+    {
+      matcher: "/admin/bundled-products",
+      methods: ["GET"],
+      middlewares: [
+        validateAndTransformQuery(createFindParams(), {
+          defaults: [
+            "id", 
+            "title", 
+            "product.*", 
+            "items.*", 
+            "items.product.*",
+          ],
+          isList: true,
+          defaultLimit: 15,
+        }),
+      ],
+    },
+    {
+      matcher: "/store/carts/:id/line-item-bundles",
+      methods: ["POST"],
+      middlewares: [
+        validateAndTransformBody(PostCartsBundledLineItemsSchema)
+      ],
     }
   ],
 })

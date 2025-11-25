@@ -6,3 +6,4 @@ Product feed plugin documentation: https://github.com/medusajs/examples/tree/mai
 Search plugin documentation: https://github.com/medusajs/examples/tree/main/meilisearch-integration
 Invoice Generator plugin documentation: https://github.com/medusajs/examples/tree/main/invoice-generator
 Product Reviews plugin documentation: https://github.com/medusajs/examples/tree/main/product-reviews
+Bundled Products plugin documentation: https://github.com/medusajs/examples/tree/main/bundled-products
