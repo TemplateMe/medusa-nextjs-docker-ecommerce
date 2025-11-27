@@ -4,14 +4,28 @@ import EmptyCartMessage from "../components/empty-cart-message"
 import SignInPrompt from "../components/sign-in-prompt"
 import Divider from "@modules/common/components/divider"
 import { HttpTypes } from "@medusajs/types"
+import { getLoyaltyPoints } from "@lib/data/loyalty"
 
-const CartTemplate = ({
+const CartTemplate = async ({
   cart,
   customer,
 }: {
   cart: HttpTypes.StoreCart | null
   customer: HttpTypes.StoreCustomer | null
 }) => {
+  // Get loyalty points if customer is logged in
+  let loyaltyPoints = 0
+  
+  if (customer?.id) {
+    try {
+      loyaltyPoints = await getLoyaltyPoints()
+    } catch (error) {
+      // If error fetching points, default to 0
+      console.error("Failed to fetch loyalty points:", error)
+      loyaltyPoints = 0
+    }
+  }
+
   return (
     <div className="py-12">
       <div className="content-container" data-testid="cart-container">
@@ -31,7 +45,7 @@ const CartTemplate = ({
                 {cart && cart.region && (
                   <>
                     <div className="bg-white py-6">
-                      <Summary cart={cart as any} />
+                      <Summary cart={cart as any} loyaltyPoints={loyaltyPoints} />
                     </div>
                   </>
                 )}

@@ -1,0 +1,141 @@
+openapi: 3.0.0
+info:
+  title: Loyalty Points
+  version: 1.0.0
+servers:
+  - url: http://{{backend_url}}
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+tags:
+  - name: Auth
+paths:
+  /auth/customer/emailpass:
+    post:
+      tags:
+        - Auth
+      summary: Get JWT / Login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                email: customer@gmail.com
+                password: supersecret
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /store/customers:
+    post:
+      tags:
+        - Auth
+      summary: Register Customer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                email: customer@gmail.com
+                first_name: Customer
+                last_name: Example
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: x-publishable-api-key
+          in: header
+          schema:
+            type: string
+          example: '{{MEDUSA_PUBLISHABLE_API_KEY}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /auth/customer/emailpass/register:
+    post:
+      tags:
+        - Auth
+      summary: Get Register Token
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                email: customer@gmail.com
+                password: supersecret
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /store/customers/me/loyalty-points:
+    get:
+      tags:
+        - default
+      summary: Get Loyalty Points
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: x-publishable-api-key
+          in: header
+          schema:
+            type: string
+          example: '{{MEDUSA_PUBLISHABLE_API_KEY}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /store/carts/{cart_id}/loyalty-points:
+    post:
+      tags:
+        - default
+      summary: Apply Loyalty on Cart
+      requestBody:
+        content: {}
+      parameters:
+        - name: x-publishable-api-key
+          in: header
+          schema:
+            type: string
+          example: '{{MEDUSA_PUBLISHABLE_API_KEY}}'
+        - name: cart_id
+          in: path
+          schema:
+            type: string
+          required: true
+          example: cart_01JRAGFB4ZNX1Z3S605TCFYN3V
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+    delete:
+      tags:
+        - default
+      summary: Remove Loyalty on Cart
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: x-publishable-api-key
+          in: header
+          schema:
+            type: string
+          example: '{{MEDUSA_PUBLISHABLE_API_KEY}}'
+        - name: cart_id
+          in: path
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}

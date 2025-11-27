@@ -14,6 +14,7 @@ import {
   setCartId,
 } from "./cookies"
 import { getRegion } from "./regions"
+import { removeLoyaltyPoints } from "./loyalty"
 
 /**
  * Retrieves a cart by its ID. If no ID is provided, it will use the cart ID from the cookies.
@@ -44,7 +45,7 @@ export async function retrieveCart(cartId?: string, fields?: string) {
       },
       headers,
       next,
-      cache: "force-cache",
+      cache: "no-store",
     })
     .then(({ cart }: { cart: HttpTypes.StoreCart }) => cart)
     .catch(() => null)
@@ -77,13 +78,40 @@ export async function getOrSetCart(countryCode: string) {
     revalidateTag(cartCacheTag)
   }
 
-  if (cart && cart?.region_id !== region.id) {
+  if (cart && cart.region_id !== region.id) {
     await sdk.store.cart.update(cart.id, { region_id: region.id }, {}, headers)
     const cartCacheTag = await getCacheTag("carts")
     revalidateTag(cartCacheTag)
   }
 
   return cart
+}
+
+/**
+ * Helper function to check if loyalty points are applied and remove them
+ */
+async function removeAppliedLoyaltyPoints(cartId: string) {
+  try {
+    // Fetch current cart to check if loyalty promotion is applied
+    const cart = await retrieveCart(cartId)
+    
+    if (!cart) return
+    
+    // Check if cart has loyalty promotion applied
+    const cartWithPromotions = cart as any
+    const hasLoyaltyPromo = 
+      (cartWithPromotions.metadata?.loyalty_promo_id && 
+       cartWithPromotions.promotions?.some((p: any) => p.id === cartWithPromotions.metadata?.loyalty_promo_id)) ||
+      cartWithPromotions.promotions?.some((p: any) => p.code?.toLowerCase().includes("loyalty"))
+    
+    if (hasLoyaltyPromo) {
+      // Remove loyalty points discount
+      await removeLoyaltyPoints(cartId)
+    }
+  } catch (error) {
+    // Silently fail if loyalty removal fails - don't block cart updates
+    console.error("Failed to remove loyalty points:", error)
+  }
 }
 
 export async function updateCart(data: HttpTypes.StoreUpdateCart) {
@@ -134,6 +162,9 @@ export async function addToCart({
     ...(await getAuthHeaders()),
   }
 
+  // Remove loyalty points if applied before adding new item
+  await removeAppliedLoyaltyPoints(cart.id)
+
   await sdk.store.cart
     .createLineItem(
       cart.id,
@@ -175,6 +206,9 @@ export async function updateLineItem({
     ...(await getAuthHeaders()),
   }
 
+  // Remove loyalty points if applied before updating quantity
+  await removeAppliedLoyaltyPoints(cartId)
+
   await sdk.store.cart
     .updateLineItem(cartId, lineId, { quantity }, {}, headers)
     .then(async () => {
@@ -201,6 +235,9 @@ export async function deleteLineItem(lineId: string) {
   const headers = {
     ...(await getAuthHeaders()),
   }
+
+  // Remove loyalty points if applied before deleting item
+  await removeAppliedLoyaltyPoints(cartId)
 
   await sdk.store.cart
     .deleteLineItem(cartId, lineId, headers)
@@ -421,6 +458,10 @@ export async function placeOrder(cartId?: string) {
     throw new Error("No existing cart found when placing an order")
   }
 
+  // Get the cart first to retrieve the region/country code
+  const cart = await retrieveCart(id)
+  const regionCountryCode = cart?.region?.countries?.[0]?.iso_2?.toLowerCase() || 'us'
+
   const headers = {
     ...(await getAuthHeaders()),
   }
@@ -459,14 +500,23 @@ export async function placeOrder(cartId?: string) {
   }
 
   if (cartRes?.type === "order") {
+    // Use country code from order shipping address, or fallback to region country
     const countryCode =
-      cartRes.order.shipping_address?.country_code?.toLowerCase()
+      cartRes.order.shipping_address?.country_code?.toLowerCase() || regionCountryCode
+
+    // Get the order ID - it might be in different places depending on the response
+    const orderId = cartRes.order?.id || cartRes.order?.display_id
+    
+    if (!orderId) {
+      console.error("Order ID not found in cart completion response:", cartRes)
+      throw new Error("Order was created but ID is missing from response")
+    }
 
     const orderCacheTag = await getCacheTag("orders")
     revalidateTag(orderCacheTag)
 
     removeCartId()
-    redirect(`/${countryCode}/order/${cartRes?.order.id}/confirmed`)
+    redirect(`/${countryCode}/order/${orderId}/confirmed`)
   }
 
   return (cartRes as any).cart

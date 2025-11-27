@@ -8,7 +8,9 @@ import OnboardingCta from "@modules/order/components/onboarding-cta"
 import OrderDetails from "@modules/order/components/order-details"
 import ShippingDetails from "@modules/order/components/shipping-details"
 import PaymentDetails from "@modules/order/components/payment-details"
+import OrderLoyaltyPoints from "@modules/order/components/order-loyalty-points"
 import { HttpTypes } from "@medusajs/types"
+import { getLoyaltyPoints } from "@lib/data/loyalty"
 
 type OrderCompletedTemplateProps = {
   order: HttpTypes.StoreOrder
@@ -20,6 +22,18 @@ export default async function OrderCompletedTemplate({
   const cookies = await nextCookies()
 
   const isOnboarding = cookies.get("_medusa_onboarding")?.value === "true"
+  
+  // Get loyalty points if customer exists
+  let loyaltyPoints = 0
+  
+  if (order.customer_id) {
+    try {
+      loyaltyPoints = await getLoyaltyPoints()
+    } catch (error) {
+      // If error fetching points, default to 0
+      loyaltyPoints = 0
+    }
+  }
 
   return (
     <div className="py-6 min-h-[calc(100vh-64px)]">
@@ -36,6 +50,9 @@ export default async function OrderCompletedTemplate({
             <span>Thank you!</span>
             <span>Your order was placed successfully.</span>
           </Heading>
+          {loyaltyPoints > 0 && (
+            <OrderLoyaltyPoints order={order as any} loyaltyPoints={loyaltyPoints} />
+          )}
           <OrderDetails order={order} />
           <Heading level="h2" className="flex flex-row text-3xl-regular">
             Summary

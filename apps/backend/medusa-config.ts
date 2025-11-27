@@ -73,6 +73,9 @@ module.exports = defineConfig({
       resolve: "./src/modules/bundled-product",
     },
     {
+      resolve: "./src/modules/loyalty",
+    },
+    {
       resolve: "@medusajs/medusa/auth",
       dependencies: [Modules.CACHE, ContainerRegistrationKeys.LOGGER],
       options: {

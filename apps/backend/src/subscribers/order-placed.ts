@@ -4,6 +4,7 @@ import type {
 } from "@medusajs/framework"
 import { Modules } from "@medusajs/framework/utils"
 import { generateInvoicePdfWorkflow } from "../workflows/generate-invoice-pdf"
+import { handleOrderPointsWorkflow } from "../workflows/handle-order-points"
 
 /**
  * Subscriber that sends an admin notification when an order is placed
@@ -47,7 +48,7 @@ export default async function orderPlacedHandler({
     const formattedTotal = new Intl.NumberFormat("en-US", {
       style: "currency",
       currency: order.currency_code?.toUpperCase() || "USD",
-    }).format((order.total || 0) / 100)
+    }).format(order.total || 0)
 
     // Create notification for admin dashboard
     await notificationModuleService.createNotifications({
@@ -61,6 +62,20 @@ export default async function orderPlacedHandler({
     })
 
     logger.info(`Order placed notification sent for order: ${order.display_id || order.id}`)
+
+    // Handle loyalty points for the order
+    try {
+      logger.info(`Processing loyalty points for order: ${data.id}`)
+      await handleOrderPointsWorkflow(container).run({
+        input: {
+          order_id: data.id,
+        },
+      })
+      logger.info(`Loyalty points processed successfully for order: ${data.id}`)
+    } catch (pointsError: any) {
+      logger.error(`Failed to process loyalty points: ${pointsError?.message || pointsError}`)
+      // Continue execution even if points processing fails
+    }
 
     // Generate PDF invoice and send via email
     try {
@@ -187,6 +202,7 @@ Your Store Team
       logger.error(`Error stack:`, pdfError?.stack)
       // Continue execution even if PDF generation fails
     }
+
   } catch (error: any) {
     logger.error(`Failed to send order placed notification: ${error?.message || error}`)
   }

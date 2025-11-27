@@ -4,6 +4,7 @@ import ChevronDown from "@modules/common/icons/chevron-down"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { convertToLocale } from "@lib/util/money"
 import { HttpTypes } from "@medusajs/types"
+import LoyaltyPointsCard from "../loyalty-points-card"
 
 type OverviewProps = {
   customer: HttpTypes.StoreCustomer | null
@@ -63,6 +64,8 @@ const Overview = ({ customer, orders }: OverviewProps) => {
                   </span>
                 </div>
               </div>
+
+              <LoyaltyPointsCard />
             </div>
 
             <div className="flex flex-col gap-y-4">

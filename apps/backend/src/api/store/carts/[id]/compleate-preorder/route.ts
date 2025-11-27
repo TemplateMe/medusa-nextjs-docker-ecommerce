@@ -13,8 +13,11 @@ export const POST = async (
     }
   })
 
+  // The workflow returns order as an array, so we need to extract the first element
+  const order = Array.isArray(result.order) ? result.order[0] : result.order
+
   res.json({
     type: "order",
-    order: result.order,
+    order: order,
   })
 }

@@ -10,20 +10,15 @@ export const retrieveOrder = async (id: string) => {
     ...(await getAuthHeaders()),
   }
 
-  const next = {
-    ...(await getCacheOptions("orders")),
-  }
-
   return sdk.client
     .fetch<HttpTypes.StoreOrderResponse>(`/store/orders/${id}`, {
       method: "GET",
       query: {
         fields:
-          "*payment_collections.payments,*items,*items.metadata,*items.variant,*items.product,+metadata",
+          "*payment_collections.payments,*items,*items.metadata,*items.variant,*items.product,+metadata,*cart,*cart.promotions,*cart.promotions.rules,*cart.promotions.rules.values,*cart.promotions.application_method",
       },
       headers,
-      next,
-      cache: "force-cache",
+      cache: "no-store",
     })
     .then(({ order }) => order)
     .catch((err) => medusaError(err))

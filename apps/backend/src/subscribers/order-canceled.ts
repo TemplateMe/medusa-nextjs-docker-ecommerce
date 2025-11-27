@@ -46,7 +46,7 @@ export default async function orderCanceledHandler({
     const formattedTotal = new Intl.NumberFormat("en-US", {
       style: "currency",
       currency: order.currency_code?.toUpperCase() || "USD",
-    }).format((order.total || 0) / 100)
+    }).format(order.total || 0)
 
     // Create notification for admin dashboard
     await notificationModuleService.createNotifications({

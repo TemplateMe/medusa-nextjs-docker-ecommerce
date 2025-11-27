@@ -11,7 +11,7 @@ type WorkflowInput = {
 export const completeCartPreorderWorkflow = createWorkflow(
   "complete-cart-preorder",
   (input: WorkflowInput) => {
-    const { id } = completeCartWorkflow.runAsStep({
+    const { id: orderId } = completeCartWorkflow.runAsStep({
       input: {
         id: input.cart_id,
       }
@@ -38,7 +38,7 @@ export const completeCartPreorderWorkflow = createWorkflow(
     .then(() => {
       const preorders = createPreordersStep({
         preorder_variant_ids: preorderItemIds,
-        order_id: id
+        order_id: orderId
       })
 
       // Extract preorder IDs and emit events
@@ -54,6 +54,8 @@ export const completeCartPreorderWorkflow = createWorkflow(
     const { data: orders } = useQueryGraphStep({
       entity: "order",
       fields: [
+        "id",
+        "display_id",
         "*",
         "items.*",
         "items.variant.*",
@@ -64,7 +66,7 @@ export const completeCartPreorderWorkflow = createWorkflow(
         "shipping_methods.*",
       ],
       filters: {
-        id,
+        id: orderId,
       }
     }).config({ name: "retrieve-order" });
 

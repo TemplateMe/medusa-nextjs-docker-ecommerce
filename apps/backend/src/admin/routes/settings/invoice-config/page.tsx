@@ -224,7 +224,7 @@ const InvoiceConfigPage = () => {
                       src={getImageUrl(field.value)}
                       alt="Company Logo"
                       className="mt-2 h-24 w-24 object-contain"
-                      onError={(e) => {
+                      onError={() => {
                         console.error("Failed to load image. URL:", getImageUrl(field.value))
                         console.error("Original value:", field.value)
                         console.error("MinIO Config:", minioConfig)
