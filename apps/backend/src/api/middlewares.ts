@@ -1,4 +1,4 @@
-import { 
+import {
   defineMiddlewares,
   authenticate,
   validateAndTransformBody,
@@ -15,7 +15,9 @@ import { GetStoreReviewsSchema } from "./store/products/[id]/reviews/route"
 import { GetAdminReviewsSchema } from "./admin/reviews/route"
 import { PostCartsBundledLineItemsSchema } from "./store/carts/[id]/line-item-bundles/route"
 import { PostBundledProductsSchema } from "./admin/bundled-products/route";
-  
+
+export const GetCustomSchema = createFindParams()
+
 export default defineMiddlewares({
   routes: [
     {
@@ -23,6 +25,27 @@ export default defineMiddlewares({
       method: "POST",
       middlewares: [
         validateAndTransformBody(PostStoreCreateWishlistItem),
+      ],
+    },
+    {
+      matcher: "/admin/subscriptions",
+      method: "GET",
+      middlewares: [
+        validateAndTransformQuery(
+          GetCustomSchema,
+          {
+            defaults: [
+              "id",
+              "subscription_date",
+              "expiration_date",
+              "status",
+              "metadata.*",
+              "orders.*",
+              "customer.*",
+            ],
+            isList: true,
+          }
+        ),
       ],
     },
     {
@@ -51,12 +74,12 @@ export default defineMiddlewares({
     },
     {
       matcher: "/store/reviews",
-      method: ["POST"], 
+      method: ["POST"],
       middlewares: [
         authenticate("customer", ["session", "bearer"]),
         validateAndTransformBody(PostStoreReviewSchema)
       ]
-    }, 
+    },
     {
       matcher: "/store/products/:id/reviews",
       methods: ["GET"],
@@ -108,10 +131,10 @@ export default defineMiddlewares({
       middlewares: [
         validateAndTransformQuery(createFindParams(), {
           defaults: [
-            "id", 
-            "title", 
-            "product.*", 
-            "items.*", 
+            "id",
+            "title",
+            "product.*",
+            "items.*",
             "items.product.*",
           ],
           isList: true,

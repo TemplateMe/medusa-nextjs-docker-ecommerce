@@ -94,16 +94,16 @@ async function removeAppliedLoyaltyPoints(cartId: string) {
   try {
     // Fetch current cart to check if loyalty promotion is applied
     const cart = await retrieveCart(cartId)
-    
+
     if (!cart) return
-    
+
     // Check if cart has loyalty promotion applied
     const cartWithPromotions = cart as any
-    const hasLoyaltyPromo = 
-      (cartWithPromotions.metadata?.loyalty_promo_id && 
-       cartWithPromotions.promotions?.some((p: any) => p.id === cartWithPromotions.metadata?.loyalty_promo_id)) ||
+    const hasLoyaltyPromo =
+      (cartWithPromotions.metadata?.loyalty_promo_id &&
+        cartWithPromotions.promotions?.some((p: any) => p.id === cartWithPromotions.metadata?.loyalty_promo_id)) ||
       cartWithPromotions.promotions?.some((p: any) => p.code?.toLowerCase().includes("loyalty"))
-    
+
     if (hasLoyaltyPromo) {
       // Remove loyalty points discount
       await removeLoyaltyPoints(cartId)
@@ -241,6 +241,39 @@ export async function deleteLineItem(lineId: string) {
 
   await sdk.store.cart
     .deleteLineItem(cartId, lineId, headers)
+    .then(async () => {
+      const cartCacheTag = await getCacheTag("carts")
+      revalidateTag(cartCacheTag)
+
+      const fulfillmentCacheTag = await getCacheTag("fulfillment")
+      revalidateTag(fulfillmentCacheTag)
+    })
+    .catch(medusaError)
+}
+
+export async function deleteBundle(bundleId: string) {
+  if (!bundleId) {
+    throw new Error("Missing bundle ID when deleting bundle")
+  }
+
+  const cartId = await getCartId()
+
+  if (!cartId) {
+    throw new Error("Missing cart ID when deleting bundle")
+  }
+
+  const headers = {
+    ...(await getAuthHeaders()),
+  }
+
+  // Remove loyalty points if applied before deleting bundle
+  await removeAppliedLoyaltyPoints(cartId)
+
+  await sdk.client
+    .fetch(`/store/carts/${cartId}/line-item-bundles/${bundleId}`, {
+      method: "DELETE",
+      headers,
+    })
     .then(async () => {
       const cartCacheTag = await getCacheTag("carts")
       revalidateTag(cartCacheTag)
@@ -426,7 +459,7 @@ export async function setAddresses(currentState: unknown, formData: FormData) {
 async function cartHasPreorderItems(cartId: string): Promise<boolean> {
   try {
     const cart = await retrieveCart(cartId)
-    
+
     if (!cart || !cart.items || cart.items.length === 0) {
       return false
     }
@@ -506,7 +539,7 @@ export async function placeOrder(cartId?: string) {
 
     // Get the order ID - it might be in different places depending on the response
     const orderId = cartRes.order?.id || cartRes.order?.display_id
-    
+
     if (!orderId) {
       console.error("Order ID not found in cart completion response:", cartRes)
       throw new Error("Order was created but ID is missing from response")

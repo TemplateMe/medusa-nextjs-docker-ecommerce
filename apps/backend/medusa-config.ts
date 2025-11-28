@@ -76,6 +76,9 @@ module.exports = defineConfig({
       resolve: "./src/modules/loyalty",
     },
     {
+      resolve: "./modules/subscription",
+    },
+    {
       resolve: "@medusajs/medusa/payment",
       options: {
         providers: [
@@ -135,7 +138,7 @@ module.exports = defineConfig({
     },
     {
       resolve: "@medusajs/medusa/event-bus-redis",
-      options: { 
+      options: {
         redisUrl: process.env.REDIS_URL,
       },
     },

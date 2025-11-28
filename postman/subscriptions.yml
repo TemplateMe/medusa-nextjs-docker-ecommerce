@@ -1,0 +1,155 @@
+openapi: 3.0.0
+info:
+  title: Subscriptions
+  version: 1.0.0
+servers:
+  - url: http://{{backend_url}}
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+tags:
+  - name: Storefront
+  - name: Storefront > Auth
+  - name: Storefront > Customer
+  - name: Admin
+  - name: Admin > Auth
+paths:
+  /auth/customer/emailpass:
+    post:
+      tags:
+        - Storefront > Auth
+      summary: Get JWT / Login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                email: customer@gmail.com
+                password: supersecret
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /store/customers:
+    post:
+      tags:
+        - Storefront > Auth
+      summary: Register Customer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                email: customer@gmail.com
+                first_name: Customer
+                last_name: Example
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /store/customers/me/subscriptions:
+    get:
+      tags:
+        - Storefront > Customer
+      summary: Get Subscriptions
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: x-publishable-api-key
+          in: header
+          schema:
+            type: string
+          example: '{{MEDUSA_PUBLISHABLE_API_KEY}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /store/customers/me/subscriptions/01J2VB8TVC14K29FREQ2DRS6NA:
+    post:
+      tags:
+        - Storefront > Customer
+      summary: Cancel Subscription
+      requestBody:
+        content: {}
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: x-publishable-api-key
+          in: query
+          schema:
+            type: string
+          example: '{{MEDUSA_PUBLISHABLE_API_KEY}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /store/cart/[id]/subscribe:
+    post:
+      tags:
+        - Storefront
+      summary: Complete Subscription
+      requestBody:
+        content: {}
+      parameters:
+        - name: x-publishable-api-key
+          in: header
+          schema:
+            type: string
+          example: '{{MEDUSA_PUBLISHABLE_API_KEY}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /auth/user/emailpass:
+    post:
+      tags:
+        - Admin > Auth
+      summary: Login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                email: admin@medusajs.com
+                password: supersecret
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /admin/subscriptions:
+    get:
+      tags:
+        - Admin
+      summary: Get Subscriptions
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /admin/subscriptions/01J2V2HWBBBM7X632859Q9W2EV:
+    get:
+      tags:
+        - Admin
+      summary: Get a Subscription
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}

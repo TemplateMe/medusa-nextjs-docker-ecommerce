@@ -8,3 +8,4 @@ Invoice Generator plugin documentation: https://github.com/medusajs/examples/tre
 Product Reviews plugin documentation: https://github.com/medusajs/examples/tree/main/product-reviews
 Bundled Products plugin documentation: https://github.com/medusajs/examples/tree/main/bundled-products
 Loyalty Points plugin documentation: https://github.com/medusajs/examples/tree/main/loyalty-points
+Subscriptions plugin documentation: https://github.com/medusajs/examples/tree/main/subscription

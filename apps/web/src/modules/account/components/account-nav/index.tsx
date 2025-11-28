@@ -9,6 +9,7 @@ import User from "@modules/common/icons/user"
 import MapPin from "@modules/common/icons/map-pin"
 import Package from "@modules/common/icons/package"
 import Heart from "@modules/common/icons/heart"
+import ArrowPath from "@modules/common/icons/arrow-path"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { HttpTypes } from "@medusajs/types"
 import { signout } from "@lib/data/customer"
@@ -120,6 +121,21 @@ const AccountNav = ({
                   </LocalizedClientLink>
                 </li>
                 <li>
+                  <LocalizedClientLink
+                    href="/account/subscriptions"
+                    className="flex items-center justify-between py-4 border-b border-gray-200 px-8"
+                    data-testid="subscriptions-link"
+                  >
+                    <>
+                      <div className="flex items-center gap-x-2">
+                        <ArrowPath size={20} />
+                        <span>Subscriptions</span>
+                      </div>
+                      <ChevronDown className="transform -rotate-90" />
+                    </>
+                  </LocalizedClientLink>
+                </li>
+                <li>
                   <button
                     type="button"
                     className="flex items-center justify-between py-4 border-b border-gray-200 px-8 w-full"
@@ -197,6 +213,15 @@ const AccountNav = ({
                   data-testid="preorders-link"
                 >
                   Pre-orders
+                </AccountNavLink>
+              </li>
+              <li>
+                <AccountNavLink
+                  href="/account/subscriptions"
+                  route={route!}
+                  data-testid="subscriptions-link"
+                >
+                  Subscriptions
                 </AccountNavLink>
               </li>
               <li className="text-grey-700">
