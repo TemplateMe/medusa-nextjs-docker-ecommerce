@@ -6,6 +6,7 @@ import { Badge, Heading, Text } from "@medusajs/ui"
 import { convertToLocale } from "@lib/util/money"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import Thumbnail from "@modules/products/components/thumbnail"
+import { useTranslation } from "@lib/i18n/client"
 
 // Simple package icon component
 const PackageIcon = ({ size = 24, className = "" }: { size?: number; className?: string }) => (
@@ -32,6 +33,7 @@ type BundleCardProps = {
 }
 
 export default function BundleCard({ bundle, region }: BundleCardProps) {
+  const { t } = useTranslation()
   const product = bundle.product
   const itemCount = bundle.items.reduce((sum, item) => sum + item.quantity, 0)
 
@@ -48,6 +50,13 @@ export default function BundleCard({ bundle, region }: BundleCardProps) {
   const savings = bundlePrice && individualTotal > bundlePrice 
     ? individualTotal - bundlePrice 
     : 0
+
+  const getItemsText = () => {
+    if (itemCount === 1) {
+      return t("bundles.itemsIncluded", { count: itemCount })
+    }
+    return t("bundles.itemsIncludedPlural", { count: itemCount })
+  }
 
   return (
     <div className="group relative border border-ui-border-base rounded-lg overflow-hidden hover:shadow-elevation-card-hover transition-shadow bg-ui-bg-base">
@@ -73,7 +82,7 @@ export default function BundleCard({ bundle, region }: BundleCardProps) {
           <div className="absolute top-2 left-2">
             <Badge size="small" color="purple">
               <PackageIcon size={12} className="mr-1 inline-block" />
-              Bundle
+              {t("bundles.bundle")}
             </Badge>
           </div>
 
@@ -81,11 +90,10 @@ export default function BundleCard({ bundle, region }: BundleCardProps) {
           {savings > 0 && currencyCode && (
             <div className="absolute top-2 right-2">
               <Badge size="small" color="green">
-                Save{" "}
-                {convertToLocale({
+                {t("bundles.saveAmount", { amount: convertToLocale({
                   amount: savings,
                   currency_code: currencyCode,
-                })}
+                })})}
               </Badge>
             </div>
           )}
@@ -99,7 +107,7 @@ export default function BundleCard({ bundle, region }: BundleCardProps) {
             </Heading>
             
             <Text className="text-sm text-ui-fg-subtle mb-3">
-              {itemCount} {itemCount === 1 ? "item" : "items"} included
+              {getItemsText()}
             </Text>
 
             {/* Bundle Items Preview */}
@@ -108,7 +116,7 @@ export default function BundleCard({ bundle, region }: BundleCardProps) {
                 <Text key={idx} className="text-xs text-ui-fg-subtle flex items-start">
                   <span className="mr-1">•</span>
                   <span className="flex-1">
-                    {item.quantity}x {item.variant?.product?.title || "Product"}
+                    {item.quantity}x {item.variant?.product?.title || item.product?.title || t("products.product")}
                     {item.variant?.title && item.variant.title !== "Default Variant" && (
                       <span className="text-ui-fg-muted"> ({item.variant.title})</span>
                     )}
@@ -117,7 +125,7 @@ export default function BundleCard({ bundle, region }: BundleCardProps) {
               ))}
               {bundle.items.length > 3 && (
                 <Text className="text-xs text-ui-fg-muted italic">
-                  +{bundle.items.length - 3} more
+                  {t("bundles.more", { count: bundle.items.length - 3 })}
                 </Text>
               )}
             </div>
@@ -144,8 +152,7 @@ export default function BundleCard({ bundle, region }: BundleCardProps) {
               </div>
               {savings > 0 && (
                 <Text className="text-xs text-green-600 mt-1">
-                  Save{" "}
-                  {Math.round((savings / individualTotal) * 100)}% when buying together
+                  {t("bundles.savePercent", { percent: Math.round((savings / individualTotal) * 100) })}
                 </Text>
               )}
             </div>

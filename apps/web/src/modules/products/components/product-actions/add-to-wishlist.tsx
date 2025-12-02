@@ -5,6 +5,7 @@ import { Button } from "@medusajs/ui"
 import Heart from "@modules/common/icons/heart"
 import { addToWishlist, removeFromWishlist, Wishlist } from "@lib/data/wishlist"
 import { useRouter } from "next/navigation"
+import { useTranslation } from "@lib/i18n"
 
 type AddToWishlistProps = {
   variantId: string
@@ -23,6 +24,7 @@ export default function AddToWishlist({
   isAuthenticated,
   countryCode,
 }: AddToWishlistProps) {
+  const { t } = useTranslation()
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -55,7 +57,7 @@ export default function AddToWishlist({
       router.refresh()
     } catch (error: any) {
       console.error("Failed to update wishlist:", error)
-      setError(error?.message || "Failed to update wishlist")
+      setError(error?.message || t("errors.failedToUpdateWishlist"))
     } finally {
       setIsLoading(false)
     }
@@ -74,10 +76,10 @@ export default function AddToWishlist({
         <Heart size={20} filled={isInWishlist} />
         <span>
           {!isAuthenticated
-            ? "Sign in to save"
+            ? t("wishlist.signInToSave")
             : isInWishlist
-            ? "Remove from wishlist"
-            : "Add to wishlist"}
+            ? t("wishlist.removeFromWishlist")
+            : t("wishlist.addToWishlist")}
         </span>
       </Button>
       {error && (

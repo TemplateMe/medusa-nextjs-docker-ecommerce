@@ -6,6 +6,7 @@ import { MagnifyingGlassMini, XMark } from "@medusajs/icons"
 import { debounce } from "@lib/util/debounce"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import Thumbnail from "@modules/products/components/thumbnail"
+import { useTranslation } from "@lib/i18n/client"
 
 interface SearchResult {
   id: string
@@ -33,6 +34,7 @@ export default function SearchModal({
   isOpen: boolean
   onClose: () => void
 }) {
+  const { t } = useTranslation()
   const [query, setQuery] = useState("")
   const [results, setResults] = useState<SearchResult[]>([])
   const [isLoading, setIsLoading] = useState(false)
@@ -82,7 +84,7 @@ export default function SearchModal({
       setResults(data.hits)
       setSearchTime(data.processingTimeMs)
     } catch (err) {
-      setError("Failed to search products")
+      setError(t("search.error"))
       console.error(err)
     } finally {
       setIsLoading(false)
@@ -119,13 +121,13 @@ export default function SearchModal({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-3xl max-h-[80vh] flex flex-col p-0">
         <DialogHeader className="px-6 pt-6 pb-4 border-b">
-          <DialogTitle className="sr-only">Search Products</DialogTitle>
+          <DialogTitle className="sr-only">{t("search.title")}</DialogTitle>
           <div className="relative">
             <MagnifyingGlassMini className="absolute left-3 top-1/2 -translate-y-1/2 text-ui-fg-muted" />
             <input
               ref={inputRef}
               type="text"
-              placeholder="Search for products..."
+              placeholder={t("search.placeholder")}
               value={query}
               onChange={handleInputChange}
               className="w-full pl-10 pr-10 py-3 text-base border rounded-lg focus:outline-none focus:ring-2 focus:ring-ui-fg-interactive"
@@ -135,7 +137,7 @@ export default function SearchModal({
               <button
                 onClick={handleClearSearch}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-ui-fg-muted hover:text-ui-fg-base"
-                aria-label="Clear search"
+                aria-label={t("search.clear")}
               >
                 <XMark />
               </button>
@@ -143,7 +145,7 @@ export default function SearchModal({
           </div>
           {searchTime > 0 && (
             <div className="text-xs text-ui-fg-muted mt-2">
-              Found {results.length} results in {searchTime}ms
+              {t("search.foundResults", { count: results.length, time: searchTime })}
             </div>
           )}
         </DialogHeader>
@@ -156,18 +158,18 @@ export default function SearchModal({
           )}
 
           {error && (
-            <div className="text-center py-8 text-red-500">{error}</div>
+            <div className="text-center py-8 text-red-500">{t("search.error")}</div>
           )}
 
           {!isLoading && !error && query && results.length === 0 && (
             <div className="text-center py-8 text-ui-fg-muted">
-              No products found for &quot;{query}&quot;
+              {t("search.noResults", { query })}
             </div>
           )}
 
           {!query && !isLoading && (
             <div className="text-center py-8 text-ui-fg-muted">
-              Start typing to search for products...
+              {t("search.startTyping")}
             </div>
           )}
 

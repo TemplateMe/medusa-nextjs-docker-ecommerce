@@ -9,6 +9,7 @@ import OrderDetails from "@modules/order/components/order-details"
 import OrderSummary from "@modules/order/components/order-summary"
 import ShippingDetails from "@modules/order/components/shipping-details"
 import React from "react"
+import { useTranslation } from "@lib/i18n"
 
 type OrderDetailsTemplateProps = {
   order: HttpTypes.StoreOrder
@@ -17,6 +18,7 @@ type OrderDetailsTemplateProps = {
 const OrderDetailsTemplate: React.FC<OrderDetailsTemplateProps> = ({
   order,
 }) => {
+  const { t } = useTranslation()
   // Check if order has invoice metadata (cast to any to access metadata)
   const hasInvoice = !!(order as any).metadata?.invoice_id || !!(order as any).metadata?.has_invoice
   
@@ -64,14 +66,14 @@ const OrderDetailsTemplate: React.FC<OrderDetailsTemplateProps> = ({
       document.body.removeChild(a)
     } catch (error) {
       console.error("Error downloading invoice:", error)
-      alert("Failed to download invoice. Please try again.")
+      alert(t("errors.failedToDownloadInvoice"))
     }
   }
 
   return (
     <div className="flex flex-col justify-center gap-y-4">
       <div className="flex gap-2 justify-between items-center">
-        <h1 className="text-2xl-semi">Order details</h1>
+        <h1 className="text-2xl-semi">{t("orders.orderDetails")}</h1>
         <div className="flex gap-2 items-center">
           {hasInvoice && (
             <button
@@ -79,7 +81,7 @@ const OrderDetailsTemplate: React.FC<OrderDetailsTemplateProps> = ({
               className="flex gap-2 items-center px-4 py-2 bg-ui-fg-base text-ui-fg-on-color rounded-md hover:bg-ui-fg-base/90 transition-colors"
               data-testid="download-invoice-button"
             >
-              Download Invoice
+              {t("orders.downloadInvoice")}
             </button>
           )}
           <LocalizedClientLink
@@ -87,7 +89,7 @@ const OrderDetailsTemplate: React.FC<OrderDetailsTemplateProps> = ({
             className="flex gap-2 items-center text-ui-fg-subtle hover:text-ui-fg-base"
             data-testid="back-to-overview-button"
           >
-            <XMark /> Back to overview
+            <XMark /> {t("orders.backToOverview")}
           </LocalizedClientLink>
         </div>
       </div>

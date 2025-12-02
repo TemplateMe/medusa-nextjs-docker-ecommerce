@@ -4,6 +4,7 @@ import { useState } from "react"
 import { addBundleToCart } from "@lib/data/bundles"
 import { Button } from "@medusajs/ui"
 import { Plus, Check } from "@medusajs/icons"
+import { useTranslation } from "@lib/i18n"
 
 type AddBundleButtonProps = {
   bundleId: string
@@ -20,6 +21,7 @@ export default function AddBundleButton({
   size = "base",
   className,
 }: AddBundleButtonProps) {
+  const { t } = useTranslation()
   const [isAdding, setIsAdding] = useState(false)
   const [success, setSuccess] = useState(false)
 
@@ -55,14 +57,14 @@ export default function AddBundleButton({
       {success ? (
         <>
           <Check className="mr-2" />
-          Added
+          {t("bundles.addedToCart")}
         </>
       ) : isAdding ? (
-        "Adding..."
+        t("bundles.addingToCart")
       ) : (
         <>
           <Plus className="mr-2" />
-          Add to Cart
+          {t("product.addToCart")}
         </>
       )}
     </Button>

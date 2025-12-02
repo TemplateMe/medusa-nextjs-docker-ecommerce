@@ -4,8 +4,14 @@ import { Text, clx } from "@medusajs/ui"
 
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import MedusaCTA from "@modules/layout/components/medusa-cta"
+import { createTranslator, type Dictionary } from "@lib/i18n"
 
-export default async function Footer() {
+interface FooterProps {
+  dictionary: Dictionary
+}
+
+export default async function Footer({ dictionary }: FooterProps) {
+  const t = createTranslator(dictionary)
   const { collections } = await listCollections({
     fields: "*products",
   })
@@ -20,14 +26,14 @@ export default async function Footer() {
               href="/"
               className="txt-compact-xlarge-plus text-ui-fg-subtle hover:text-ui-fg-base uppercase"
             >
-              Medusa Store
+              {t("footer.storeName")}
             </LocalizedClientLink>
           </div>
           <div className="text-small-regular gap-10 md:gap-x-16 grid grid-cols-2 sm:grid-cols-3">
             {productCategories && productCategories?.length > 0 && (
               <div className="flex flex-col gap-y-2">
                 <span className="txt-small-plus txt-ui-fg-base">
-                  Categories
+                  {t("footer.categories")}
                 </span>
                 <ul
                   className="grid grid-cols-1 gap-2"
@@ -85,7 +91,7 @@ export default async function Footer() {
             {collections && collections.length > 0 && (
               <div className="flex flex-col gap-y-2">
                 <span className="txt-small-plus txt-ui-fg-base">
-                  Collections
+                  {t("footer.collections")}
                 </span>
                 <ul
                   className={clx(
@@ -109,7 +115,7 @@ export default async function Footer() {
               </div>
             )}
             <div className="flex flex-col gap-y-2">
-              <span className="txt-small-plus txt-ui-fg-base">Medusa</span>
+              <span className="txt-small-plus txt-ui-fg-base">{t("footer.medusa")}</span>
               <ul className="grid grid-cols-1 gap-y-2 text-ui-fg-subtle txt-small">
                 <li>
                   <a
@@ -118,7 +124,7 @@ export default async function Footer() {
                     rel="noreferrer"
                     className="hover:text-ui-fg-base"
                   >
-                    GitHub
+                    {t("footer.github")}
                   </a>
                 </li>
                 <li>
@@ -128,7 +134,7 @@ export default async function Footer() {
                     rel="noreferrer"
                     className="hover:text-ui-fg-base"
                   >
-                    Documentation
+                    {t("footer.documentation")}
                   </a>
                 </li>
                 <li>
@@ -138,7 +144,7 @@ export default async function Footer() {
                     rel="noreferrer"
                     className="hover:text-ui-fg-base"
                   >
-                    Source code
+                    {t("footer.sourceCode")}
                   </a>
                 </li>
               </ul>
@@ -147,7 +153,7 @@ export default async function Footer() {
         </div>
         <div className="flex w-full mb-16 justify-between text-ui-fg-muted">
           <Text className="txt-compact-small">
-            © {new Date().getFullYear()} Medusa Store. All rights reserved.
+            © {new Date().getFullYear()} {t("footer.storeName")}. {t("footer.allRightsReserved")}.
           </Text>
           <MedusaCTA />
         </div>

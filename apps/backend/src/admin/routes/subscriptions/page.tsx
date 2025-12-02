@@ -6,62 +6,12 @@ import { SubscriptionData, SubscriptionStatus } from "../../types"
 import { useQuery } from "@tanstack/react-query"
 import { sdk } from "../../lib/sdk"
 import { useNavigate } from "react-router-dom"
-
-const getBadgeColor = (status: SubscriptionStatus) => {
-  switch(status) {
-    case SubscriptionStatus.CANCELED:
-      return "orange"
-    case SubscriptionStatus.FAILED:
-      return "red"
-    case SubscriptionStatus.EXPIRED:
-      return "grey"
-    default:
-      return "green"
-  }
-}
-
-const getStatusTitle = (status: SubscriptionStatus) => {
-  return status.charAt(0).toUpperCase() + 
-    status.substring(1)
-}
+import { useTranslation } from "react-i18next"
 
 const columnHelper = createDataTableColumnHelper<SubscriptionData>()
 
-const columns = [
-  columnHelper.accessor("id", {
-    header: "#",
-  }),
-  columnHelper.accessor("metadata.main_order_id", {
-    header: "Main Order",
-  }),
-  columnHelper.accessor("customer.email", {
-    header: "Customer"
-  }),
-  columnHelper.accessor("subscription_date", {
-    header: "Subscription Date",
-    cell: ({ getValue }) => {
-      return getValue().toLocaleString()
-    }
-  }),
-  columnHelper.accessor("expiration_date", {
-    header: "Expiry Date",
-    cell: ({ getValue }) => {
-      return getValue().toLocaleString()
-    }
-  }),
-  columnHelper.accessor("status", {
-    header: "Status",
-    cell: ({ getValue }) => {
-      return (
-        <Badge color={getBadgeColor(getValue())}>
-          {getStatusTitle(getValue())}
-        </Badge>
-      )
-    }
-  }),
-]
-
 const SubscriptionsPage = () => {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const [pagination, setPagination] = useState<DataTablePaginationState>({
     pageSize: 4,
@@ -83,6 +33,66 @@ const SubscriptionsPage = () => {
     queryKey: ["subscriptions", query.toString()],
   })
 
+  const getBadgeColor = (status: SubscriptionStatus) => {
+    switch(status) {
+      case SubscriptionStatus.CANCELED:
+        return "orange"
+      case SubscriptionStatus.FAILED:
+        return "red"
+      case SubscriptionStatus.EXPIRED:
+        return "grey"
+      default:
+        return "green"
+    }
+  }
+
+  const getStatusTitle = (status: SubscriptionStatus) => {
+    switch(status) {
+      case SubscriptionStatus.CANCELED:
+        return t("subscriptions.canceled")
+      case SubscriptionStatus.FAILED:
+        return t("subscriptions.failed")
+      case SubscriptionStatus.EXPIRED:
+        return t("subscriptions.expired")
+      default:
+        return t("subscriptions.active")
+    }
+  }
+
+  const columns = useMemo(() => [
+    columnHelper.accessor("id", {
+      header: "#",
+    }),
+    columnHelper.accessor("metadata.main_order_id", {
+      header: t("subscriptions.mainOrder"),
+    }),
+    columnHelper.accessor("customer.email", {
+      header: t("common.customer")
+    }),
+    columnHelper.accessor("subscription_date", {
+      header: t("subscriptions.subscriptionDate"),
+      cell: ({ getValue }) => {
+        return getValue().toLocaleString()
+      }
+    }),
+    columnHelper.accessor("expiration_date", {
+      header: t("subscriptions.expiryDate"),
+      cell: ({ getValue }) => {
+        return getValue().toLocaleString()
+      }
+    }),
+    columnHelper.accessor("status", {
+      header: t("common.status"),
+      cell: ({ getValue }) => {
+        return (
+          <Badge color={getBadgeColor(getValue())}>
+            {getStatusTitle(getValue())}
+          </Badge>
+        )
+      }
+    }),
+  ], [t])
+
   const table = useDataTable({
     columns,
     data: data?.subscriptions || [],
@@ -93,7 +103,7 @@ const SubscriptionsPage = () => {
       state: pagination,
       onPaginationChange: setPagination,
     },
-    onRowClick(event, row) {
+    onRowClick(_event, row) {
       navigate(`/subscriptions/${row.id}`)
     },
   })
@@ -103,11 +113,16 @@ const SubscriptionsPage = () => {
     <Container>
       <DataTable instance={table}>
         <DataTable.Toolbar>
-          <Heading level="h1">Subscriptions</Heading>
+          <Heading level="h1">{t("subscriptions.title")}</Heading>
         </DataTable.Toolbar>
 				<DataTable.Table />
-        {/** This component will render the pagination controls **/}
-        <DataTable.Pagination />
+        <DataTable.Pagination translations={{
+          of: t("general.of"),
+          results: t("general.results"),
+          pages: t("general.pages"),
+          prev: t("general.prev"),
+          next: t("general.next"),
+        }} />
       </DataTable>
     </Container>
   )

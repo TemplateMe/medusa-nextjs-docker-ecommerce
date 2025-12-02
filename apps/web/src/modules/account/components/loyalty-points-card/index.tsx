@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { getLoyaltyPoints } from "@lib/data/loyalty"
+import { useTranslation } from "@lib/i18n"
 
 type LoyaltyConfig = {
   redemption_rate: number
@@ -12,6 +13,7 @@ export default function LoyaltyPointsCard() {
   const [points, setPoints] = useState(0)
   const [config, setConfig] = useState<LoyaltyConfig>({ redemption_rate: 0.1, earning_rate: 1 })
   const [loading, setLoading] = useState(true)
+  const { t } = useTranslation()
 
   useEffect(() => {
     const fetchData = async () => {
@@ -54,7 +56,7 @@ export default function LoyaltyPointsCard() {
   if (loading) {
     return (
       <div className="flex flex-col gap-y-4">
-        <h3 className="text-large-semi">Loyalty Points</h3>
+        <h3 className="text-large-semi">{t("loyalty.title")}</h3>
         <div className="animate-pulse">
           <div className="h-8 bg-gray-200 rounded w-24 mb-2"></div>
           <div className="h-4 bg-gray-200 rounded w-48"></div>
@@ -65,7 +67,7 @@ export default function LoyaltyPointsCard() {
 
   return (
     <div className="flex flex-col gap-y-4">
-      <h3 className="text-large-semi">Loyalty Points</h3>
+      <h3 className="text-large-semi">{t("loyalty.title")}</h3>
       <div className="flex items-end gap-x-2">
         <span
           className="text-3xl-semi leading-none"
@@ -75,11 +77,11 @@ export default function LoyaltyPointsCard() {
           {points.toLocaleString()}
         </span>
         <span className="uppercase text-base-regular text-ui-fg-subtle">
-          Points
+          {t("loyalty.points")}
         </span>
       </div>
       <p className="text-small-regular text-ui-fg-subtle">
-        Worth €{pointsWorth.toFixed(2)} • Earn {earningRate} {earningRate === 1 ? 'point' : 'points'} per €1 spent
+        {t("loyalty.worth", { amount: pointsWorth.toFixed(2) })} • {t("loyalty.earnRate", { rate: earningRate, points: earningRate === 1 ? t("loyalty.point") : t("loyalty.pointsPlural") })}
       </p>
     </div>
   )

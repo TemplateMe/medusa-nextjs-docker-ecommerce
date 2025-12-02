@@ -5,6 +5,7 @@ import { Badge, Heading, Text } from "@medusajs/ui"
 import { convertToLocale } from "@lib/util/money"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import AddBundleButton from "@modules/products/components/add-bundle-button"
+import { useTranslation } from "@lib/i18n"
 
 // Simple package icon component
 const PackageIcon = ({ size = 24, className = "" }: { size?: number; className?: string }) => (
@@ -36,6 +37,7 @@ export default function BundleSuggestion({
   countryCode,
   showAddButton = true,
 }: BundleSuggestionProps) {
+  const { t } = useTranslation()
   const product = bundle.product
   const itemCount = bundle.items.reduce((sum, item) => sum + item.quantity, 0)
 
@@ -60,11 +62,11 @@ export default function BundleSuggestion({
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
             <Badge size="small" color="purple">
-              Bundle
+              {t("bundles.bundle")}
             </Badge>
             {savings > 0 && currencyCode && (
               <Badge size="small" color="green">
-                Save{" "}
+                {t("bundles.save")}{" "}
                 {convertToLocale({
                   amount: savings,
                   currency_code: currencyCode,
@@ -83,7 +85,7 @@ export default function BundleSuggestion({
           </LocalizedClientLink>
           
           <Text className="text-xs text-ui-fg-subtle mb-2">
-            {itemCount} items included
+            {t("bundles.itemsIncluded", { count: itemCount })}
           </Text>
 
           {bundlePrice !== undefined && bundlePrice !== null && currencyCode && (
@@ -113,7 +115,7 @@ export default function BundleSuggestion({
           className="flex-1"
         >
           <button className="w-full px-3 py-2 text-sm border border-ui-border-base rounded-md hover:bg-ui-bg-subtle transition-colors">
-            View Details
+            {t("bundles.viewDetails")}
           </button>
         </LocalizedClientLink>
         

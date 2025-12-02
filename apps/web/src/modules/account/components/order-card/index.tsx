@@ -5,12 +5,15 @@ import Thumbnail from "@modules/products/components/thumbnail"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { convertToLocale } from "@lib/util/money"
 import { HttpTypes } from "@medusajs/types"
+import { useTranslation } from "@lib/i18n"
 
 type OrderCardProps = {
   order: HttpTypes.StoreOrder
 }
 
 const OrderCard = ({ order }: OrderCardProps) => {
+  const { t } = useTranslation()
+
   const numberOfLines = useMemo(() => {
     return (
       order.items?.reduce((acc, item) => {
@@ -73,7 +76,7 @@ const OrderCard = ({ order }: OrderCardProps) => {
       document.body.removeChild(a)
     } catch (error) {
       console.error("Error downloading invoice:", error)
-      alert("Failed to download invoice. Please try again.")
+      alert(t("errors.failedToDownloadInvoice"))
     }
   }
 
@@ -93,7 +96,7 @@ const OrderCard = ({ order }: OrderCardProps) => {
           })}
         </span>
         <span className="pl-2">{`${numberOfLines} ${
-          numberOfLines > 1 ? "items" : "item"
+          numberOfLines > 1 ? t("orders.items") : t("orders.item")
         }`}</span>
       </div>
       <div className="grid grid-cols-2 small:grid-cols-4 gap-4 my-4">
@@ -121,9 +124,8 @@ const OrderCard = ({ order }: OrderCardProps) => {
         {numberOfProducts > 4 && (
           <div className="w-full h-full flex flex-col items-center justify-center">
             <span className="text-small-regular text-ui-fg-base">
-              + {numberOfLines - 4}
+              {t("orders.moreItems", { count: (numberOfLines - 4).toString() })}
             </span>
-            <span className="text-small-regular text-ui-fg-base">more</span>
           </div>
         )}
       </div>
@@ -134,12 +136,12 @@ const OrderCard = ({ order }: OrderCardProps) => {
             variant="secondary"
             data-testid="download-invoice-button"
           >
-            Download Invoice
+            {t("orders.downloadInvoice")}
           </Button>
         )}
         <LocalizedClientLink href={`/account/orders/details/${order.id}`}>
           <Button data-testid="order-details-link" variant="secondary">
-            See details
+            {t("orders.seeDetails")}
           </Button>
         </LocalizedClientLink>
       </div>

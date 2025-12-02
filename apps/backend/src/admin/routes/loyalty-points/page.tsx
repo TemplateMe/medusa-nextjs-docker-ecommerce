@@ -22,6 +22,7 @@ import { sdk } from "../../lib/sdk"
 import { Link } from "react-router-dom"
 import AdjustPointsDialog from "../../components/adjust-points-dialog.tsx"
 import LoyaltyAnalytics from "../../components/loyalty-analytics.tsx"
+import { useTranslation } from "react-i18next"
 
 type LoyaltyPoint = {
   id: string
@@ -51,64 +52,10 @@ type LoyaltyConfig = {
 
 const columnHelper = createDataTableColumnHelper<LoyaltyPoint>()
 
-const columns = [
-  columnHelper.accessor("id", {
-    header: "ID",
-    cell: ({ row }) => {
-      return <Text size="small" className="font-mono">{row.original.id.slice(0, 8)}...</Text>
-    }
-  }),
-  columnHelper.accessor("customer", {
-    header: "Customer",
-    cell: ({ row }) => {
-      const customer = row.original.customer
-      const name = customer?.first_name && customer?.last_name 
-        ? `${customer.first_name} ${customer.last_name}`
-        : customer?.email || "Unknown"
-      
-      return (
-        <Link
-          to={`/customers/${row.original.customer_id}`}
-          className="text-blue-600 hover:underline"
-        >
-          {name}
-        </Link>
-      )
-    }
-  }),
-  columnHelper.accessor("customer.email", {
-    header: "Email",
-    cell: ({ row }) => {
-      return <Text size="small">{row.original.customer?.email || "N/A"}</Text>
-    }
-  }),
-  columnHelper.accessor("points", {
-    header: "Points Balance",
-    cell: ({ row }) => {
-      const points = row.original.points
-      const color = points > 1000 ? "green" : points > 500 ? "blue" : "grey"
-      return (
-        <Badge color={color} size="small">
-          {points.toLocaleString()} pts
-        </Badge>
-      )
-    }
-  }),
-  columnHelper.accessor("updated_at", {
-    header: "Last Updated",
-    cell: ({ row }) => {
-      return (
-        <Text size="small">
-          {new Date(row.original.updated_at).toLocaleDateString()}
-        </Text>
-      )
-    }
-  }),
-]
-
 const limit = 20
 
 const LoyaltyPointsPage = () => {
+  const { t } = useTranslation()
   const queryClient = useQueryClient()
   const [pagination, setPagination] = useState<DataTablePaginationState>({
     pageSize: limit,
@@ -159,19 +106,70 @@ const LoyaltyPointsPage = () => {
       })
     },
     onSuccess: () => {
-      toast.success("Configuration updated successfully")
+      toast.success(t("loyalty.configSaveSuccess"))
       queryClient.invalidateQueries({ queryKey: ["loyalty-config"] })
     },
     onError: (error: any) => {
-      toast.error(error.message || "Failed to update configuration")
+      toast.error(error.message || t("loyalty.configSaveError"))
     },
   })
 
-  const columnsWithActions = useMemo(() => [
-    ...columns,
+  const columns = useMemo(() => [
+    columnHelper.accessor("id", {
+      header: t("common.id"),
+      cell: ({ row }) => {
+        return <Text size="small" className="font-mono">{row.original.id.slice(0, 8)}...</Text>
+      }
+    }),
+    columnHelper.accessor("customer", {
+      header: t("common.customer"),
+      cell: ({ row }) => {
+        const customer = row.original.customer
+        const name = customer?.first_name && customer?.last_name 
+          ? `${customer.first_name} ${customer.last_name}`
+          : customer?.email || "Unknown"
+        
+        return (
+          <Link
+            to={`/customers/${row.original.customer_id}`}
+            className="text-blue-600 hover:underline"
+          >
+            {name}
+          </Link>
+        )
+      }
+    }),
+    columnHelper.accessor("customer.email", {
+      header: t("loyalty.email"),
+      cell: ({ row }) => {
+        return <Text size="small">{row.original.customer?.email || "N/A"}</Text>
+      }
+    }),
+    columnHelper.accessor("points", {
+      header: t("loyalty.points"),
+      cell: ({ row }) => {
+        const points = row.original.points
+        const color = points > 1000 ? "green" : points > 500 ? "blue" : "grey"
+        return (
+          <Badge color={color} size="small">
+            {points.toLocaleString()} pts
+          </Badge>
+        )
+      }
+    }),
+    columnHelper.accessor("updated_at", {
+      header: t("common.date"),
+      cell: ({ row }) => {
+        return (
+          <Text size="small">
+            {new Date(row.original.updated_at).toLocaleDateString()}
+          </Text>
+        )
+      }
+    }),
     columnHelper.display({
       id: "actions",
-      header: "Actions",
+      header: t("common.actions"),
       cell: ({ row }) => {
         return (
           <Button
@@ -182,15 +180,15 @@ const LoyaltyPointsPage = () => {
               setIsAdjustDialogOpen(true)
             }}
           >
-            Adjust Points
+            {t("loyalty.adjust")}
           </Button>
         )
       },
     }),
-  ], [])
+  ], [t])
 
   const table = useDataTable({
-    columns: columnsWithActions,
+    columns,
     data: data?.loyalty_points ?? [],
     rowCount: data?.count ?? 0,
     isLoading,
@@ -201,7 +199,7 @@ const LoyaltyPointsPage = () => {
   })
 
   const handleAdjustSuccess = () => {
-    toast.success("Points adjusted successfully")
+    toast.success(t("loyalty.adjustSuccess"))
     refetch()
     setIsAdjustDialogOpen(false)
     setSelectedCustomer(null)
@@ -240,8 +238,8 @@ const LoyaltyPointsPage = () => {
     <div className="flex flex-col gap-4">
       <Tabs defaultValue="management">
         <Tabs.List>
-          <Tabs.Trigger value="management">Points Management</Tabs.Trigger>
-          <Tabs.Trigger value="configuration">Configuration</Tabs.Trigger>
+          <Tabs.Trigger value="management">{t("loyalty.customers")}</Tabs.Trigger>
+          <Tabs.Trigger value="configuration">{t("loyalty.configuration")}</Tabs.Trigger>
         </Tabs.List>
         
         <Tabs.Content value="management" className="space-y-4 mt-4">
@@ -251,14 +249,20 @@ const LoyaltyPointsPage = () => {
             <DataTable instance={table}>
               <DataTable.Toolbar className="flex items-start justify-between gap-2 md:flex-row md:items-center">
                 <div>
-                  <Heading>Loyalty Points Management</Heading>
+                  <Heading>{t("loyalty.title")}</Heading>
                   <Text size="small" className="text-ui-fg-subtle mt-1">
-                    Manage customer loyalty points and view balances
+                    {t("common.description")}
                   </Text>
                 </div>
               </DataTable.Toolbar>
               <DataTable.Table />
-              <DataTable.Pagination />
+              <DataTable.Pagination translations={{
+                of: t("general.of"),
+                results: t("general.results"),
+                pages: t("general.pages"),
+                prev: t("general.prev"),
+                next: t("general.next"),
+              }} />
             </DataTable>
           </Container>
         </Tabs.Content>
@@ -267,44 +271,27 @@ const LoyaltyPointsPage = () => {
           <Container>
             <div className="p-6">
               <div className="mb-6">
-                <Heading level="h1">Loyalty Program Configuration</Heading>
+                <Heading level="h1">{t("loyalty.configuration")}</Heading>
                 <Text size="small" className="text-ui-fg-subtle mt-2">
-                  Configure how customers earn and redeem loyalty points
+                  {t("loyalty.programOverview")}
                 </Text>
               </div>
 
               {isConfigLoading ? (
                 <div className="p-6">
-                  <Text>Loading configuration...</Text>
+                  <Text>{t("common.loading")}</Text>
                 </div>
               ) : (
                 <form onSubmit={handleConfigSubmit} className="space-y-8">
-                  {/* General Settings */}
-                  <div className="space-y-4">
-                    <Heading level="h2" className="text-lg">General Settings</Heading>
-                    <div className="flex items-center justify-between p-4 bg-ui-bg-subtle rounded-md">
-                      <div>
-                        <Label>Program Active</Label>
-                        <Text size="small" className="text-ui-fg-subtle">
-                          Enable or disable the entire loyalty program
-                        </Text>
-                      </div>
-                      <Switch
-                        checked={formData.is_active ?? true}
-                        onCheckedChange={(checked) => handleSwitchChange("is_active", checked)}
-                      />
-                    </div>
-                  </div>
-
                   {/* Earning Rules */}
                   <div className="space-y-4">
-                    <Heading level="h2" className="text-lg">Earning Rules</Heading>
+                    <Heading level="h2" className="text-lg">{t("loyalty.earningRules")}</Heading>
                     
                     <div className="flex items-center justify-between p-4 bg-ui-bg-subtle rounded-md">
                       <div>
-                        <Label>Earning Enabled</Label>
+                        <Label>{t("common.enabled")}</Label>
                         <Text size="small" className="text-ui-fg-subtle">
-                          Allow customers to earn points from orders
+                          {t("loyalty.welcomeBonusDescription")}
                         </Text>
                       </div>
                       <Switch
@@ -314,9 +301,9 @@ const LoyaltyPointsPage = () => {
                     </div>
 
                     <div>
-                      <Label htmlFor="earning_rate">Points per Currency Unit</Label>
+                      <Label htmlFor="earning_rate">{t("loyalty.pointsPerCurrency")}</Label>
                       <Text size="small" className="text-ui-fg-subtle mb-2">
-                        How many points customers earn per $1 spent (e.g., 1 = 1 point per dollar)
+                        {t("loyalty.pointsPerCurrencyDescription")}
                       </Text>
                       <Input
                         id="earning_rate"
@@ -329,9 +316,9 @@ const LoyaltyPointsPage = () => {
                     </div>
 
                     <div>
-                      <Label htmlFor="min_order_amount">Minimum Order Amount</Label>
+                      <Label htmlFor="min_order_amount">{t("loyalty.minOrderValue")}</Label>
                       <Text size="small" className="text-ui-fg-subtle mb-2">
-                        Minimum order value required to earn points (0 = no minimum)
+                        {t("loyalty.minOrderValueDescription")}
                       </Text>
                       <Input
                         id="min_order_amount"
@@ -346,13 +333,13 @@ const LoyaltyPointsPage = () => {
 
                   {/* Redemption Rules */}
                   <div className="space-y-4">
-                    <Heading level="h2" className="text-lg">Redemption Rules</Heading>
+                    <Heading level="h2" className="text-lg">{t("loyalty.redemptionRules")}</Heading>
                     
                     <div className="flex items-center justify-between p-4 bg-ui-bg-subtle rounded-md">
                       <div>
-                        <Label>Redemption Enabled</Label>
+                        <Label>{t("common.enabled")}</Label>
                         <Text size="small" className="text-ui-fg-subtle">
-                          Allow customers to redeem points for discounts
+                          {t("loyalty.redemptionRules")}
                         </Text>
                       </div>
                       <Switch
@@ -362,9 +349,9 @@ const LoyaltyPointsPage = () => {
                     </div>
 
                     <div>
-                      <Label htmlFor="redemption_rate">Currency Value per Point</Label>
+                      <Label htmlFor="redemption_rate">{t("loyalty.pointsPerCurrencyRedemption")}</Label>
                       <Text size="small" className="text-ui-fg-subtle mb-2">
-                        How much discount each point provides (e.g., 1 = $1 discount per point)
+                        {t("loyalty.pointsPerCurrencyRedemptionDescription")}
                       </Text>
                       <Input
                         id="redemption_rate"
@@ -377,9 +364,9 @@ const LoyaltyPointsPage = () => {
                     </div>
 
                     <div>
-                      <Label htmlFor="min_points_redemption">Minimum Points to Redeem</Label>
+                      <Label htmlFor="min_points_redemption">{t("loyalty.minPointsRedemption")}</Label>
                       <Text size="small" className="text-ui-fg-subtle mb-2">
-                        Minimum points required to redeem (0 = no minimum)
+                        {t("loyalty.minPointsRedemptionDescription")}
                       </Text>
                       <Input
                         id="min_points_redemption"
@@ -391,9 +378,9 @@ const LoyaltyPointsPage = () => {
                     </div>
 
                     <div>
-                      <Label htmlFor="max_points_per_order">Maximum Points per Order</Label>
+                      <Label htmlFor="max_points_per_order">{t("loyalty.maxRedemptionPercentage")}</Label>
                       <Text size="small" className="text-ui-fg-subtle mb-2">
-                        Maximum points that can be used per order (leave empty for unlimited)
+                        {t("loyalty.maxRedemptionPercentageDescription")}
                       </Text>
                       <Input
                         id="max_points_per_order"
@@ -401,7 +388,6 @@ const LoyaltyPointsPage = () => {
                         min="0"
                         value={formData.max_points_per_order ?? ""}
                         onChange={(e) => handleNumberChange("max_points_per_order", e.target.value)}
-                        placeholder="Unlimited"
                       />
                     </div>
                   </div>
@@ -411,7 +397,7 @@ const LoyaltyPointsPage = () => {
                       type="submit"
                       disabled={updateMutation.isPending}
                     >
-                      {updateMutation.isPending ? "Saving..." : "Save Configuration"}
+                      {updateMutation.isPending ? t("common.loading") : t("common.save")}
                     </Button>
                   </div>
                 </form>

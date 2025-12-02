@@ -1,5 +1,8 @@
+"use client"
+
 import { Preorder } from "../../../types/preorder"
 import PreorderCard from "../components/preorder-card"
+import { useTranslation } from "@lib/i18n"
 
 type PreordersTemplateProps = {
   preorders: Preorder[]
@@ -10,6 +13,8 @@ export default function PreordersTemplate({
   preorders,
   countryCode,
 }: PreordersTemplateProps) {
+  const { t } = useTranslation()
+
   if (!preorders || preorders.length === 0) {
     return (
       <div className="w-full" data-testid="preorders-page-empty">
@@ -28,10 +33,10 @@ export default function PreordersTemplate({
             />
           </svg>
           <h3 className="mt-2 text-sm font-medium text-gray-900">
-            No pre-orders
+            {t("preorders.noPreorders")}
           </h3>
           <p className="mt-1 text-sm text-gray-500">
-            You haven't placed any pre-orders yet.
+            {t("preorders.noPreordersDescription")}
           </p>
         </div>
       </div>
@@ -41,10 +46,9 @@ export default function PreordersTemplate({
   return (
     <div className="w-full" data-testid="preorders-page">
       <div className="mb-8 flex flex-col gap-y-4">
-        <h1 className="text-2xl-semi">Pre-orders</h1>
+        <h1 className="text-2xl-semi">{t("preorders.title")}</h1>
         <p className="text-base-regular">
-          View and manage your pre-ordered items. You'll be notified when they
-          become available.
+          {t("preorders.description")}
         </p>
       </div>
       

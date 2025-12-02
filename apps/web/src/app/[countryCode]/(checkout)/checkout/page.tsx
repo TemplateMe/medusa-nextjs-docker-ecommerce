@@ -10,7 +10,12 @@ export const metadata: Metadata = {
   title: "Checkout",
 }
 
-export default async function Checkout() {
+type Props = {
+  params: Promise<{ countryCode: string }>
+}
+
+export default async function Checkout({ params }: Props) {
+  const { countryCode } = await params
   const cart = await retrieveCart()
 
   if (!cart) {
@@ -24,7 +29,7 @@ export default async function Checkout() {
       <PaymentWrapper cart={cart}>
         <CheckoutForm cart={cart} customer={customer} />
       </PaymentWrapper>
-      <CheckoutSummary cart={cart} />
+      <CheckoutSummary cart={cart} countryCode={countryCode} />
     </div>
   )
 }

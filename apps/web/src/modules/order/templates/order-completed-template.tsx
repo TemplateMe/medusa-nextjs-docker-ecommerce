@@ -11,14 +11,20 @@ import PaymentDetails from "@modules/order/components/payment-details"
 import OrderLoyaltyPoints from "@modules/order/components/order-loyalty-points"
 import { HttpTypes } from "@medusajs/types"
 import { getLoyaltyPoints } from "@lib/data/loyalty"
+import { getDictionary, createTranslator, getLocaleFromCountry } from "@lib/i18n"
 
 type OrderCompletedTemplateProps = {
   order: HttpTypes.StoreOrder
+  countryCode: string
 }
 
 export default async function OrderCompletedTemplate({
   order,
+  countryCode,
 }: OrderCompletedTemplateProps) {
+  const locale = getLocaleFromCountry(countryCode)
+  const dictionary = await getDictionary(locale)
+  const t = createTranslator(dictionary)
   const cookies = await nextCookies()
 
   const isOnboarding = cookies.get("_medusa_onboarding")?.value === "true"
@@ -47,15 +53,15 @@ export default async function OrderCompletedTemplate({
             level="h1"
             className="flex flex-col gap-y-3 text-ui-fg-base text-3xl mb-4"
           >
-            <span>Thank you!</span>
-            <span>Your order was placed successfully.</span>
+            <span>{t("orders.thankYou")}</span>
+            <span>{t("orders.orderPlaced")}</span>
           </Heading>
           {loyaltyPoints > 0 && (
             <OrderLoyaltyPoints order={order as any} loyaltyPoints={loyaltyPoints} />
           )}
           <OrderDetails order={order} />
           <Heading level="h2" className="flex flex-row text-3xl-regular">
-            Summary
+            {t("cart.summary")}
           </Heading>
           <Items order={order} />
           <CartTotals totals={order} />

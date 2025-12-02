@@ -9,6 +9,7 @@ import { HttpTypes } from "@medusajs/types"
 import Trash from "@modules/common/icons/trash"
 import ErrorMessage from "../error-message"
 import { SubmitButton } from "../submit-button"
+import { useTranslation } from "@lib/i18n"
 
 type DiscountCodeProps = {
   cart: HttpTypes.StoreCart & {
@@ -19,6 +20,7 @@ type DiscountCodeProps = {
 const DiscountCode: React.FC<DiscountCodeProps> = ({ cart }) => {
   const [isOpen, setIsOpen] = React.useState(false)
   const [errorMessage, setErrorMessage] = React.useState("")
+  const { t } = useTranslation()
 
   const { promotions = [] } = cart
   const removePromotionCode = async (code: string) => {
@@ -29,6 +31,16 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({ cart }) => {
     await applyPromotions(
       validPromotions.filter((p) => p.code !== undefined).map((p) => p.code!)
     )
+  }
+
+  // Helper to translate common error patterns
+  const translateError = (error: string): string => {
+    // Match "The promotion code X is invalid" pattern
+    const promoCodeMatch = error.match(/The promotion code (\w+) is invalid/i)
+    if (promoCodeMatch) {
+      return t("errors.invalidPromoCode", { code: promoCodeMatch[1] })
+    }
+    return error
   }
 
   const addPromotionCode = async (formData: FormData) => {
@@ -47,7 +59,7 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({ cart }) => {
     try {
       await applyPromotions(codes)
     } catch (e: any) {
-      setErrorMessage(e.message)
+      setErrorMessage(translateError(e.message))
     }
 
     if (input) {
@@ -66,7 +78,7 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({ cart }) => {
               className="txt-medium text-ui-fg-interactive hover:text-ui-fg-interactive-hover"
               data-testid="add-discount-button"
             >
-              Add Promotion Code(s)
+              {t("checkout.promotionCode")}
             </button>
 
             {/* <Tooltip content="You can add multiple promotion codes">
@@ -89,7 +101,7 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({ cart }) => {
                   variant="secondary"
                   data-testid="discount-apply-button"
                 >
-                  Apply
+                  {t("common.submit")}
                 </SubmitButton>
               </div>
 
@@ -105,7 +117,7 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({ cart }) => {
           <div className="w-full flex items-center">
             <div className="flex flex-col w-full">
               <Heading className="txt-medium mb-2">
-                Promotion(s) applied:
+                {t("checkout.promotionCodeApplied")}
               </Heading>
 
               {promotions.map((promotion) => {
@@ -161,7 +173,7 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({ cart }) => {
                       >
                         <Trash size={14} />
                         <span className="sr-only">
-                          Remove discount code from order
+                          {t("accessibility.removeDiscountCode")}
                         </span>
                       </button>
                     )}

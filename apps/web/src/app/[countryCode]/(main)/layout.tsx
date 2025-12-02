@@ -8,12 +8,22 @@ import CartMismatchBanner from "@modules/layout/components/cart-mismatch-banner"
 import Footer from "@modules/layout/templates/footer"
 import Nav from "@modules/layout/templates/nav"
 import FreeShippingPriceNudge from "@modules/shipping/components/free-shipping-price-nudge"
+import { getDictionary, getLocaleFromCountry } from "@lib/i18n"
 
 export const metadata: Metadata = {
   metadataBase: new URL(getBaseURL()),
 }
 
-export default async function PageLayout(props: { children: React.ReactNode }) {
+interface LayoutProps {
+  children: React.ReactNode
+  params: Promise<{ countryCode: string }>
+}
+
+export default async function PageLayout({ children, params }: LayoutProps) {
+  const { countryCode } = await params
+  const locale = getLocaleFromCountry(countryCode)
+  const dictionary = await getDictionary(locale)
+  
   const customer = await retrieveCustomer()
   const cart = await retrieveCart()
   let shippingOptions: StoreCartShippingOption[] = []
@@ -26,7 +36,7 @@ export default async function PageLayout(props: { children: React.ReactNode }) {
 
   return (
     <>
-      <Nav />
+      <Nav dictionary={dictionary} />
       {customer && cart && (
         <CartMismatchBanner customer={customer} cart={cart} />
       )}
@@ -36,10 +46,11 @@ export default async function PageLayout(props: { children: React.ReactNode }) {
           variant="popup"
           cart={cart}
           shippingOptions={shippingOptions}
+          dictionary={dictionary}
         />
       )}
-      {props.children}
-      <Footer />
+      {children}
+      <Footer dictionary={dictionary} />
     </>
   )
 }

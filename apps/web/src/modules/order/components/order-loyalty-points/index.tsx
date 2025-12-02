@@ -1,4 +1,5 @@
 import { HttpTypes } from "@medusajs/types"
+import { getDictionary, createTranslator } from "@lib/i18n"
 
 type OrderLoyaltyPointsProps = {
   order: HttpTypes.StoreOrder & {
@@ -10,10 +11,13 @@ type OrderLoyaltyPointsProps = {
   loyaltyPoints: number
 }
 
-export default function OrderLoyaltyPoints({
+export default async function OrderLoyaltyPoints({
   order,
   loyaltyPoints,
 }: OrderLoyaltyPointsProps) {
+  const dictionary = await getDictionary("en")
+  const t = createTranslator(dictionary)
+
   // Check if loyalty promotion was used
   const hasLoyaltyPromo =
     order.cart?.metadata?.loyalty_promo_id &&
@@ -40,14 +44,13 @@ export default function OrderLoyaltyPoints({
           <div className="text-4xl">🎁</div>
           <div className="flex-1">
             <h3 className="text-large-semi mb-2">
-              Loyalty Points Redeemed
+              {t("loyalty.pointsRedeemed")}
             </h3>
             <p className="text-base-regular text-ui-fg-subtle mb-1">
-              You used <span className="font-semibold">{pointsUsed.toLocaleString()} points</span> for a discount of{" "}
-              <span className="font-semibold">${(discountAmount / 100).toLocaleString()}.00</span>
+              {t("loyalty.youUsedPoints", { points: pointsUsed.toLocaleString(), discount: (discountAmount / 100).toLocaleString() })}
             </p>
             <p className="text-small-regular text-ui-fg-subtle">
-              Current balance: {loyaltyPoints.toLocaleString()} points
+              {t("loyalty.currentBalance", { points: loyaltyPoints.toLocaleString() })}
             </p>
           </div>
         </div>
@@ -63,16 +66,16 @@ export default function OrderLoyaltyPoints({
           <div className="text-4xl">🎉</div>
           <div className="flex-1">
             <h3 className="text-large-semi text-green-800 dark:text-green-300 mb-2">
-              Congratulations! You Earned Points
+              {t("loyalty.congratulationsEarnedPoints")}
             </h3>
             <p className="text-base-regular text-green-700 dark:text-green-400 mb-1">
-              You earned <span className="font-bold text-xl">{pointsEarned.toLocaleString()} loyalty points</span> from this order!
+              {t("loyalty.youEarnedPoints", { points: pointsEarned.toLocaleString() })}
             </p>
             <p className="text-small-regular text-ui-fg-subtle">
-              New balance: {loyaltyPoints.toLocaleString()} points (worth ${loyaltyPoints.toLocaleString()}.00)
+              {t("loyalty.newBalance", { points: loyaltyPoints.toLocaleString(), worth: loyaltyPoints.toLocaleString() })}
             </p>
             <p className="text-xs text-ui-fg-subtle mt-3">
-              💡 Use your points on your next purchase to get an instant discount!
+              💡 {t("loyalty.usePointsTip")}
             </p>
           </div>
         </div>

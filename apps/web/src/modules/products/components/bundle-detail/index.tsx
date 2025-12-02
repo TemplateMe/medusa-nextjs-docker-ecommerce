@@ -8,6 +8,7 @@ import { convertToLocale } from "@lib/util/money"
 import { Plus, Check } from "@medusajs/icons"
 import Thumbnail from "@modules/products/components/thumbnail"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
+import { useTranslation } from "@lib/i18n/client"
 
 // Simple package icon component
 const PackageIcon = ({ size = 24, className = "" }: { size?: number; className?: string }) => (
@@ -39,6 +40,7 @@ export default function BundleDetail({
   region,
   countryCode,
 }: BundleDetailProps) {
+  const { t } = useTranslation()
   const [isAdding, setIsAdding] = useState(false)
   const [success, setSuccess] = useState(false)
 
@@ -79,21 +81,27 @@ export default function BundleDetail({
     }
   }
 
+  const getItemsText = () => {
+    if (itemCount === 1) {
+      return `${itemCount} ${t("bundles.item")}`
+    }
+    return `${itemCount} ${t("bundles.items")}`
+  }
+
   return (
     <div className="space-y-8">
       {/* Header */}
       <div className="flex items-start gap-3">
         <Badge size="base" color="purple">
           <PackageIcon size={16} className="mr-1 inline-block" />
-          Bundle Package
+          {t("bundles.bundlePackage")}
         </Badge>
         {savings > 0 && currencyCode && (
           <Badge size="base" color="green">
-            Save{" "}
-            {convertToLocale({
+            {t("bundles.saveAmount", { amount: convertToLocale({
               amount: savings,
               currency_code: currencyCode,
-            })}
+            })})}
           </Badge>
         )}
       </div>
@@ -103,7 +111,7 @@ export default function BundleDetail({
           {bundle.title}
         </Heading>
         <Text className="text-ui-fg-subtle">
-          This bundle includes {itemCount} {itemCount === 1 ? "item" : "items"}
+          {t("bundles.thisBundle", { count: getItemsText() })}
         </Text>
       </div>
 
@@ -128,7 +136,7 @@ export default function BundleDetail({
           </div>
           {savings > 0 && (
             <Text className="text-green-600 font-medium">
-              Save {Math.round((savings / individualTotal) * 100)}% compared to buying separately
+              {t("bundles.saveCompared", { percent: Math.round((savings / individualTotal) * 100) })}
             </Text>
           )}
         </div>
@@ -144,14 +152,14 @@ export default function BundleDetail({
         {success ? (
           <>
             <Check className="mr-2" />
-            Added to Cart
+            {t("bundles.addedToCart")}
           </>
         ) : isAdding ? (
-          "Adding..."
+          t("bundles.addingToCart")
         ) : (
           <>
             <Plus className="mr-2" />
-            Add Bundle to Cart
+            {t("bundles.addBundleToCart")}
           </>
         )}
       </Button>
@@ -159,7 +167,7 @@ export default function BundleDetail({
       {/* Bundle Items */}
       <div>
         <Heading level="h2" className="text-xl mb-4">
-          What&apos;s Included
+          {t("bundles.whatsIncluded")}
         </Heading>
         <div className="space-y-4">
           {bundle.items.map((item, idx) => {
@@ -199,12 +207,12 @@ export default function BundleDetail({
                   
                   {item.variant?.title && item.variant.title !== "Default Variant" && (
                     <Text className="text-sm text-ui-fg-subtle mb-1">
-                      Variant: {item.variant.title}
+                      {t("bundles.variant")} {item.variant.title}
                     </Text>
                   )}
                   
                   <Text className="text-sm text-ui-fg-muted">
-                    Quantity: {item.quantity}
+                    {t("bundles.quantity")} {item.quantity}
                   </Text>
                 </div>
 
@@ -234,13 +242,13 @@ export default function BundleDetail({
             </div>
             <div>
               <Heading level="h3" className="text-base font-medium text-green-900 dark:text-green-100 mb-2">
-                Why Buy This Bundle?
+                {t("bundles.whyBuyBundle")}
               </Heading>
               <ul className="space-y-1 text-sm text-green-800 dark:text-green-200">
-                <li>• Save money compared to buying items separately</li>
-                <li>• Curated selection of complementary products</li>
-                <li>• Add everything to cart in one click</li>
-                <li>• Perfect combination for your needs</li>
+                <li>• {t("bundles.reason1")}</li>
+                <li>• {t("bundles.reason2")}</li>
+                <li>• {t("bundles.reason3")}</li>
+                <li>• {t("bundles.reason4")}</li>
               </ul>
             </div>
           </div>

@@ -5,6 +5,7 @@ import WishlistItem from "../components/wishlist-item"
 import { useState } from "react"
 import { getWishlistShareToken } from "@lib/data/wishlist"
 import { Wishlist } from "@lib/data/wishlist"
+import { useTranslation } from "@lib/i18n"
 
 type WishlistTemplateProps = {
   wishlist: Wishlist | null
@@ -22,6 +23,7 @@ export default function WishlistTemplate({
   const [shareToken, setShareToken] = useState<string | null>(null)
   const [isSharing, setIsSharing] = useState(false)
   const [copied, setCopied] = useState(false)
+  const { t } = useTranslation()
 
   const handleShare = async () => {
     setIsSharing(true)
@@ -50,15 +52,15 @@ export default function WishlistTemplate({
       <div className="flex flex-col gap-y-4" data-testid="wishlist-empty">
         <div>
           <Heading level="h1" className="text-2xl-semi mb-2">
-            My Wishlist
+            {t("wishlist.title")}
           </Heading>
           <Text className="text-base-regular text-ui-fg-subtle">
-            Your wishlist is empty
+            {t("wishlist.empty")}
           </Text>
         </div>
         <div>
           <Text className="text-base-regular">
-            Start adding items to your wishlist to save them for later.
+            {t("wishlist.emptyDescription")}
           </Text>
         </div>
       </div>
@@ -73,7 +75,7 @@ export default function WishlistTemplate({
       <div className="flex flex-col gap-y-4">
         <div className="flex items-center justify-between">
           <Heading level="h1" className="text-2xl-semi">
-            My Wishlist
+            {t("wishlist.title")}
           </Heading>
           {items.length > 0 && (
             <Button
@@ -83,7 +85,7 @@ export default function WishlistTemplate({
               disabled={isSharing}
               data-testid="share-wishlist-button"
             >
-              Share Wishlist
+              {t("wishlist.shareWishlist")}
             </Button>
           )}
         </div>
@@ -92,7 +94,7 @@ export default function WishlistTemplate({
         {shareToken && (
           <div className="bg-ui-bg-subtle p-4 rounded-lg flex flex-col gap-y-2">
             <Text className="text-small-regular text-ui-fg-subtle">
-              Share this link with others to show them your wishlist:
+              {t("wishlist.shareLink")}
             </Text>
             <div className="flex gap-x-2">
               <input
@@ -107,7 +109,7 @@ export default function WishlistTemplate({
                 onClick={handleCopyLink}
                 data-testid="copy-link-button"
               >
-                {copied ? "Copied!" : "Copy"}
+                {copied ? t("wishlist.copied") : t("wishlist.copy")}
               </Button>
             </div>
           </div>
@@ -115,8 +117,10 @@ export default function WishlistTemplate({
 
         {items.length > 0 && (
           <Text className="text-base-regular text-ui-fg-subtle">
-            {items.length} {items.length === 1 ? "item" : "items"} in your
-            wishlist
+            {t("wishlist.itemsCount", { 
+              count: items.length.toString(), 
+              itemText: items.length === 1 ? t("orders.item") : t("orders.items") 
+            })}
           </Text>
         )}
       </div>
@@ -125,7 +129,7 @@ export default function WishlistTemplate({
       {items.length === 0 ? (
         <div>
           <Text className="text-base-regular text-ui-fg-subtle">
-            Your wishlist is empty. Start adding items to save them for later.
+            {t("wishlist.emptyDescription")}
           </Text>
         </div>
       ) : (

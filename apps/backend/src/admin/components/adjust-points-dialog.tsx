@@ -13,6 +13,7 @@ import { useMutation } from "@tanstack/react-query"
 import { sdk } from "../lib/sdk"
 import * as Dialog from "@radix-ui/react-dialog"
 import { XMark } from "@medusajs/icons"
+import { useTranslation } from "react-i18next"
 
 type LoyaltyPoint = {
   id: string
@@ -39,6 +40,7 @@ const AdjustPointsDialog = ({
   customer, 
   onSuccess 
 }: AdjustPointsDialogProps) => {
+  const { t } = useTranslation()
   const [pointsChange, setPointsChange] = useState<string>("")
   const [reason, setReason] = useState<string>("")
 
@@ -55,7 +57,7 @@ const AdjustPointsDialog = ({
       setReason("")
     },
     onError: (error: any) => {
-      toast.error(error.message || "Failed to adjust points")
+      toast.error(error.message || t("loyalty.adjustError"))
     },
   })
 
@@ -64,18 +66,18 @@ const AdjustPointsDialog = ({
     
     const points = parseInt(pointsChange)
     if (isNaN(points) || points === 0) {
-      toast.error("Please enter a valid point amount")
+      toast.error(t("loyalty.adjustError"))
       return
     }
 
     if (!reason.trim()) {
-      toast.error("Please provide a reason for the adjustment")
+      toast.error(t("loyalty.adjustError"))
       return
     }
 
     // Check if deducting more points than available
     if (points < 0 && Math.abs(points) > customer.points) {
-      toast.error(`Cannot deduct ${Math.abs(points)} points. Customer only has ${customer.points} points.`)
+      toast.error(t("loyalty.adjustError"))
       return
     }
 
@@ -88,7 +90,7 @@ const AdjustPointsDialog = ({
 
   const customerName = customer.customer?.first_name && customer.customer?.last_name
     ? `${customer.customer.first_name} ${customer.customer.last_name}`
-    : customer.customer?.email || "Unknown Customer"
+    : customer.customer?.email || t("common.customer")
 
   const newBalance = customer.points + (parseInt(pointsChange) || 0)
 
@@ -100,7 +102,7 @@ const AdjustPointsDialog = ({
           <div className="flex items-start justify-between mb-4">
             <div>
               <Dialog.Title asChild>
-                <Heading level="h2">Adjust Loyalty Points</Heading>
+                <Heading level="h2">{t("loyalty.adjustPoints")}</Heading>
               </Dialog.Title>
               <Dialog.Description asChild>
                 <Text size="small" className="text-ui-fg-subtle mt-1">
@@ -117,12 +119,12 @@ const AdjustPointsDialog = ({
 
           <div className="mb-4 p-3 bg-ui-bg-subtle rounded-md">
             <div className="flex items-center justify-between">
-              <Text size="small" className="text-ui-fg-subtle">Current Balance:</Text>
+              <Text size="small" className="text-ui-fg-subtle">{t("loyalty.currentBalance")}:</Text>
               <Badge color="blue">{customer.points.toLocaleString()} pts</Badge>
             </div>
             {pointsChange && !isNaN(parseInt(pointsChange)) && (
               <div className="flex items-center justify-between mt-2 pt-2 border-t border-ui-border-base">
-                <Text size="small" className="text-ui-fg-subtle">New Balance:</Text>
+                <Text size="small" className="text-ui-fg-subtle">{t("loyalty.newBalance")}:</Text>
                 <Badge color={newBalance >= 0 ? "green" : "red"}>
                   {newBalance.toLocaleString()} pts
                 </Badge>
@@ -133,9 +135,9 @@ const AdjustPointsDialog = ({
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <Label htmlFor="points" className="mb-2">
-                Points Adjustment
+                {t("loyalty.pointsAdjustment")}
                 <Text size="xsmall" className="text-ui-fg-subtle ml-1">
-                  (Use negative numbers to deduct)
+                  {t("loyalty.deductNote")}
                 </Text>
               </Label>
               <Input
@@ -150,11 +152,11 @@ const AdjustPointsDialog = ({
 
             <div>
               <Label htmlFor="reason" className="mb-2">
-                Reason <span className="text-red-500">*</span>
+                {t("loyalty.reason")} <span className="text-red-500">*</span>
               </Label>
               <Textarea
                 id="reason"
-                placeholder="Enter reason for adjustment (e.g., Customer service compensation, Promotional bonus, etc.)"
+                placeholder=""
                 value={reason}
                 onChange={(e) => setReason(e.target.value)}
                 rows={3}
@@ -168,13 +170,13 @@ const AdjustPointsDialog = ({
                 variant="secondary"
                 onClick={() => onOpenChange(false)}
               >
-                Cancel
+                {t("common.cancel")}
               </Button>
               <Button
                 type="submit"
                 disabled={adjustMutation.isPending}
               >
-                {adjustMutation.isPending ? "Adjusting..." : "Apply Adjustment"}
+                {adjustMutation.isPending ? t("loyalty.adjusting") : t("loyalty.applyAdjustment")}
               </Button>
             </div>
           </form>

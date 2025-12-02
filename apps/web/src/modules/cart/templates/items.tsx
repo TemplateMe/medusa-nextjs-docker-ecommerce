@@ -1,3 +1,5 @@
+"use client"
+
 import repeat from "@lib/util/repeat"
 import { HttpTypes } from "@medusajs/types"
 import { Heading, Table } from "@medusajs/ui"
@@ -5,29 +7,31 @@ import { Fragment } from "react"
 
 import Item from "@modules/cart/components/item"
 import SkeletonLineItem from "@modules/skeletons/components/skeleton-line-item"
+import { useTranslation } from "@lib/i18n"
 
 type ItemsTemplateProps = {
   cart?: HttpTypes.StoreCart
 }
 
 const ItemsTemplate = ({ cart }: ItemsTemplateProps) => {
+  const { t } = useTranslation()
   const items = cart?.items
   return (
     <div>
       <div className="pb-3 flex items-center">
-        <Heading className="text-[2rem] leading-[2.75rem]">Cart</Heading>
+        <Heading className="text-[2rem] leading-[2.75rem]">{t("cart.title")}</Heading>
       </div>
       <Table>
         <Table.Header className="border-t-0">
           <Table.Row className="text-ui-fg-subtle txt-medium-plus">
-            <Table.HeaderCell className="!pl-0">Item</Table.HeaderCell>
+            <Table.HeaderCell className="!pl-0">{t("cart.item")}</Table.HeaderCell>
             <Table.HeaderCell></Table.HeaderCell>
-            <Table.HeaderCell>Quantity</Table.HeaderCell>
+            <Table.HeaderCell>{t("cart.quantity")}</Table.HeaderCell>
             <Table.HeaderCell className="hidden small:table-cell">
-              Price
+              {t("cart.price")}
             </Table.HeaderCell>
             <Table.HeaderCell className="!pr-0 text-right">
-              Total
+              {t("cart.total")}
             </Table.HeaderCell>
           </Table.Row>
         </Table.Header>
@@ -79,7 +83,7 @@ const ItemsTemplate = ({ cart }: ItemsTemplateProps) => {
                         <Table.Cell {...({ colSpan: 5 } as any)} className="p-4">
                           <div className="flex items-center gap-x-2">
                             <span className="text-ui-fg-base font-medium">
-                              Bundle
+                              {t("bundles.bundle")}
                             </span>
                           </div>
                         </Table.Cell>

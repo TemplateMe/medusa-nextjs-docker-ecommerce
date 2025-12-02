@@ -16,6 +16,7 @@ import { useMemo, useState } from "react"
 import { sdk } from "../../lib/sdk"
 import { Link } from "react-router-dom"
 import CreateBundledProduct from "../../components/create-bundled-product"
+import { useTranslation } from "react-i18next"
 
 type BundledProduct = {
   id: string
@@ -37,37 +38,10 @@ type BundledProduct = {
 
 const columnHelper = createDataTableColumnHelper<BundledProduct>()
 
-const columns = [
-  columnHelper.accessor("id", {
-    header: "ID",
-  }),
-  columnHelper.accessor("title", {
-    header: "Title",
-  }),
-  columnHelper.accessor("items", {
-    header: "Items",
-    cell: ({ row }) => {
-      return row.original.items.map((item) => (
-        <div key={item.id}>
-          <Link to={`/products/${item.product.id}`}>
-            {item.product.title}
-          </Link>{" "}
-          x {item.quantity}
-        </div>
-      ))
-    },
-  }),
-  columnHelper.accessor("product", {
-    header: "Product",
-    cell: ({ row }) => {
-      return <Link to={`/products/${row.original.product?.id}`}>View Product</Link>
-    },
-  }),
-]
-
 const limit = 15
 
 const BundledProductsPage = () => {
+  const { t } = useTranslation()
   const [pagination, setPagination] = useState<DataTablePaginationState>({
     pageSize: limit,
     pageIndex: 0,
@@ -100,19 +74,19 @@ const BundledProductsPage = () => {
       })
     },
     onSuccess: () => {
-      toast.success("Bundle deleted successfully")
+      toast.success(t("bundles.deleteSuccess"))
       queryClient.invalidateQueries({ queryKey: ["bundled-products"] })
       refetch()
     },
     onError: () => {
-      toast.error("Failed to delete bundle")
+      toast.error(t("bundles.deleteError"))
     },
   })
 
   const handleDelete = async (id: string, title: string) => {
     const confirmed = await prompt({
-      title: "Delete Bundle",
-      description: `Are you sure you want to delete "${title}"? This action cannot be undone.`,
+      title: t("bundles.deleteBundle"),
+      description: t("bundles.deleteConfirm", { title }),
     })
 
     if (confirmed) {
@@ -120,11 +94,35 @@ const BundledProductsPage = () => {
     }
   }
 
-  const columnsWithActions = useMemo(() => [
-    ...columns,
+  const columns = useMemo(() => [
+    columnHelper.accessor("id", {
+      header: t("common.id"),
+    }),
+    columnHelper.accessor("title", {
+      header: t("common.title"),
+    }),
+    columnHelper.accessor("items", {
+      header: t("bundles.items"),
+      cell: ({ row }) => {
+        return row.original.items.map((item) => (
+          <div key={item.id}>
+            <Link to={`/products/${item.product.id}`}>
+              {item.product.title}
+            </Link>{" "}
+            x {item.quantity}
+          </div>
+        ))
+      },
+    }),
+    columnHelper.accessor("product", {
+      header: t("common.product"),
+      cell: ({ row }) => {
+        return <Link to={`/products/${row.original.product?.id}`}>{t("bundles.viewProduct")}</Link>
+      },
+    }),
     columnHelper.display({
       id: "actions",
-      header: "Actions",
+      header: t("common.actions"),
       cell: ({ row }) => {
         return (
           <div className="flex items-center gap-2">
@@ -139,10 +137,10 @@ const BundledProductsPage = () => {
         )
       },
     }),
-  ], [])
+  ], [t])
 
   const table = useDataTable({
-    columns: columnsWithActions,
+    columns,
     data: data?.bundled_products ?? [],
     isLoading,
     pagination: {
@@ -156,11 +154,17 @@ const BundledProductsPage = () => {
     <Container className="divide-y p-0">
       <DataTable instance={table}>
         <DataTable.Toolbar className="flex items-start justify-between gap-2 md:flex-row md:items-center">
-          <Heading>Bundled Products</Heading>
+          <Heading>{t("bundles.title")}</Heading>
           <CreateBundledProduct />
         </DataTable.Toolbar>
         <DataTable.Table />
-        <DataTable.Pagination />
+        <DataTable.Pagination translations={{
+          of: t("general.of"),
+          results: t("general.results"),
+          pages: t("general.pages"),
+          prev: t("general.prev"),
+          next: t("general.next"),
+        }} />
       </DataTable>
     </Container>
   )

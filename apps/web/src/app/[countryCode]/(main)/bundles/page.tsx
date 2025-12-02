@@ -2,6 +2,8 @@ import { listBundleProducts } from "@lib/data/bundles"
 import { getRegion } from "@lib/data/regions"
 import { Heading, Text } from "@medusajs/ui"
 import BundleCard from "@modules/products/components/bundle-card"
+import { getDictionary, getLocaleFromCountry, createTranslator } from "@lib/i18n"
+import { Metadata } from "next"
 
 // Simple package icon component
 const PackageIcon = ({ size = 24, className = "" }: { size?: number; className?: string }) => (
@@ -26,14 +28,24 @@ type Props = {
   params: Promise<{ countryCode: string }>
 }
 
-export const metadata = {
-  title: "Product Bundles",
-  description: "Discover our curated product bundles and save money",
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { countryCode } = await params
+  const locale = getLocaleFromCountry(countryCode)
+  const dictionary = await getDictionary(locale)
+  
+  return {
+    title: dictionary.metadata.bundlesTitle,
+    description: dictionary.metadata.bundlesDescription,
+  }
 }
 
 export default async function BundlesPage(props: Props) {
   const params = await props.params
   const { countryCode } = params
+  const locale = getLocaleFromCountry(countryCode)
+  const dictionary = await getDictionary(locale)
+  const t = createTranslator(dictionary)
+  
   const region = await getRegion(countryCode)
   
   if (!region) {
@@ -51,10 +63,10 @@ export default async function BundlesPage(props: Props) {
             <PackageIcon size={48} className="text-ui-fg-muted" />
           </div>
           <Heading level="h1" className="text-4xl font-bold mb-4">
-            Product Bundles
+            {t("bundles.title")}
           </Heading>
           <Text className="text-lg text-ui-fg-subtle max-w-2xl mx-auto">
-            Save money with our carefully curated product bundles. Get everything you need at a special bundled price.
+            {t("metadata.bundlesDescription")}
           </Text>
         </div>
 
@@ -69,10 +81,10 @@ export default async function BundlesPage(props: Props) {
           <div className="text-center py-24">
             <PackageIcon size={64} className="text-ui-fg-muted mx-auto mb-4" />
             <Heading level="h2" className="text-2xl mb-2">
-              No Bundles Available
+              {t("bundles.noBundlesAvailable")}
             </Heading>
             <Text className="text-ui-fg-subtle">
-              Check back soon for exciting bundle deals!
+              {t("bundles.checkBackSoon")}
             </Text>
           </div>
         )}

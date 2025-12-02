@@ -9,6 +9,7 @@ import {
   Controller,
 } from "react-hook-form"
 import { useCallback, useEffect } from "react"
+import { useTranslation } from "react-i18next"
 
 type InvoiceConfig = {
   id: string;
@@ -30,6 +31,7 @@ const schema = zod.object({
 })
 
 const InvoiceConfigPage = () => {
+  const { t } = useTranslation()
   const { data, isLoading, refetch } = useQuery<{
     invoice_config: InvoiceConfig
   }>({
@@ -54,7 +56,7 @@ const InvoiceConfigPage = () => {
       }),
     onSuccess: () => {
       refetch()
-      toast.success("Invoice config updated successfully")
+      toast.success(t("invoiceConfig.saveSuccess"))
     },
   })
 
@@ -96,7 +98,7 @@ const InvoiceConfigPage = () => {
   return (
     <Container className="divide-y p-0">
       <div className="flex items-center justify-between px-6 py-4">
-        <Heading level="h1">Invoice Config</Heading>
+        <Heading level="h1">{t("invoiceConfig.title")}</Heading>
       </div>
       <FormProvider {...form}>
         <form 
@@ -111,7 +113,7 @@ const InvoiceConfigPage = () => {
                 <div className="flex flex-col space-y-2">
                   <div className="flex items-center gap-x-1">
                     <Label size="small" weight="plus">
-                      Company Name
+                      {t("invoiceConfig.companyName")}
                     </Label>
                   </div>
                   <Input {...field} onChange={field.onChange} value={field.value} />
@@ -127,7 +129,7 @@ const InvoiceConfigPage = () => {
                 <div className="flex flex-col space-y-2">
                   <div className="flex items-center gap-x-1">
                     <Label size="small" weight="plus">
-                      Company Address
+                      {t("invoiceConfig.companyAddress")}
                     </Label>
                   </div>
                   <Textarea {...field} />
@@ -143,7 +145,7 @@ const InvoiceConfigPage = () => {
                 <div className="flex flex-col space-y-2">
                   <div className="flex items-center gap-x-1">
                     <Label size="small" weight="plus">
-                      Company Phone
+                      {t("invoiceConfig.companyPhone")}
                     </Label>
                   </div>
                   <Input {...field} />
@@ -159,7 +161,7 @@ const InvoiceConfigPage = () => {
                 <div className="flex flex-col space-y-2">
                   <div className="flex items-center gap-x-1">
                     <Label size="small" weight="plus">
-                      Company Email
+                      {t("invoiceConfig.companyEmail")}
                     </Label>
                   </div>
                   <Input {...field} />
@@ -175,7 +177,7 @@ const InvoiceConfigPage = () => {
                 <div className="flex flex-col space-y-2">
                   <div className="flex items-center gap-x-1">
                     <Label size="small" weight="plus">
-                      Notes
+                      {t("common.description")}
                     </Label>
                   </div>
                   <Textarea {...field} />
@@ -215,14 +217,14 @@ const InvoiceConfigPage = () => {
                 <div className="flex flex-col space-y-2">
                   <div className="flex items-center gap-x-1">
                     <Label size="small" weight="plus">
-                      Company Logo
+                      {t("invoiceConfig.companyLogo")}
                     </Label>
                   </div>
                   <Input type="file" onChange={uploadLogo} className="py-1" />
                   {field.value && minioConfig && (
                     <img
                       src={getImageUrl(field.value)}
-                      alt="Company Logo"
+                      alt={t("invoiceConfig.companyLogo")}
                       className="mt-2 h-24 w-24 object-contain"
                       onError={() => {
                         console.error("Failed to load image. URL:", getImageUrl(field.value))
@@ -236,7 +238,7 @@ const InvoiceConfigPage = () => {
             }}
           />
           <Button type="submit" disabled={isLoading || isPending}>
-            Save
+            {t("common.save")}
           </Button>
         </form>
       </FormProvider>

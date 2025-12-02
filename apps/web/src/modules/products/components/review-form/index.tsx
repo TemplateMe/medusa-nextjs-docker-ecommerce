@@ -6,6 +6,7 @@ import StarRating from "../star-rating"
 import { createReview } from "@lib/data/reviews"
 import Input from "@modules/common/components/input"
 import Textarea from "@modules/common/components/textarea"
+import { useTranslation } from "@lib/i18n/client"
 
 type ReviewFormProps = {
   productId: string
@@ -13,6 +14,7 @@ type ReviewFormProps = {
 }
 
 const ReviewForm: React.FC<ReviewFormProps> = ({ productId, onSuccess }) => {
+  const { t } = useTranslation()
   const [rating, setRating] = useState<number>(0)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -30,19 +32,19 @@ const ReviewForm: React.FC<ReviewFormProps> = ({ productId, onSuccess }) => {
     const lastName = formData.get("last_name") as string
 
     if (rating === 0) {
-      setError("Please select a rating")
+      setError(t("reviews.pleaseSelectRating"))
       setIsSubmitting(false)
       return
     }
 
     if (!content.trim()) {
-      setError("Please write a review")
+      setError(t("reviews.pleaseWriteReview"))
       setIsSubmitting(false)
       return
     }
 
     if (!firstName.trim() || !lastName.trim()) {
-      setError("Please provide your name")
+      setError(t("reviews.pleaseProvideName"))
       setIsSubmitting(false)
       return
     }
@@ -70,20 +72,20 @@ const ReviewForm: React.FC<ReviewFormProps> = ({ productId, onSuccess }) => {
       // Reset success message after 5 seconds
       setTimeout(() => setSuccess(false), 5000)
     } else {
-      setError(result.error || "Failed to submit review")
+      setError(result.error || t("reviews.failedToSubmit"))
     }
   }
 
   return (
     <div className="bg-white border border-gray-200 rounded-lg p-6">
       <h3 className="text-lg font-semibold text-gray-900 mb-4">
-        Write a Review
+        {t("reviews.writeReview")}
       </h3>
 
       {success && (
         <div className="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg">
           <p className="text-sm text-green-800">
-            Thank you for your review! It will be published after approval.
+            {t("reviews.thankYou")}
           </p>
         </div>
       )}
@@ -97,7 +99,7 @@ const ReviewForm: React.FC<ReviewFormProps> = ({ productId, onSuccess }) => {
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Rating <span className="text-red-500">*</span>
+            {t("reviews.rating")} <span className="text-red-500">*</span>
           </label>
           <StarRating
             rating={rating}
@@ -110,7 +112,7 @@ const ReviewForm: React.FC<ReviewFormProps> = ({ productId, onSuccess }) => {
         <div className="grid grid-cols-2 gap-4">
           <div>
             <Input
-              label="First Name"
+              label={t("reviews.firstName")}
               name="first_name"
               required
               autoComplete="given-name"
@@ -118,7 +120,7 @@ const ReviewForm: React.FC<ReviewFormProps> = ({ productId, onSuccess }) => {
           </div>
           <div>
             <Input
-              label="Last Name"
+              label={t("reviews.lastName")}
               name="last_name"
               required
               autoComplete="family-name"
@@ -128,7 +130,7 @@ const ReviewForm: React.FC<ReviewFormProps> = ({ productId, onSuccess }) => {
 
         <div>
           <Input
-            label="Review Title (Optional)"
+            label={t("reviews.reviewTitle")}
             name="title"
             autoComplete="off"
           />
@@ -136,11 +138,11 @@ const ReviewForm: React.FC<ReviewFormProps> = ({ productId, onSuccess }) => {
 
         <div>
           <Textarea
-            label="Your Review"
+            label={t("reviews.yourReview")}
             name="content"
             required
             rows={5}
-            placeholder="Share your thoughts about this product..."
+            placeholder={t("reviews.reviewPlaceholder")}
           />
         </div>
 
@@ -150,7 +152,7 @@ const ReviewForm: React.FC<ReviewFormProps> = ({ productId, onSuccess }) => {
           isLoading={isSubmitting}
           disabled={isSubmitting}
         >
-          {isSubmitting ? "Submitting..." : "Submit Review"}
+          {isSubmitting ? t("reviews.submitting") : t("reviews.submitReview")}
         </Button>
       </form>
     </div>

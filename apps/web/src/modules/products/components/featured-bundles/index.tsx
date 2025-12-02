@@ -4,6 +4,8 @@ import { Heading, Text } from "@medusajs/ui"
 import BundleCard from "@modules/products/components/bundle-card"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import InteractiveLink from "@modules/common/components/interactive-link"
+import { getDictionary, createTranslator } from "@lib/i18n/dictionary"
+import { getLocaleFromCountry } from "@lib/i18n/config"
 
 type FeaturedBundlesProps = {
   countryCode: string
@@ -15,9 +17,16 @@ type FeaturedBundlesProps = {
 export default async function FeaturedBundles({
   countryCode,
   limit = 4,
-  title = "Featured Bundles",
-  description = "Save money with our curated product bundles",
+  title,
+  description,
 }: FeaturedBundlesProps) {
+  const locale = getLocaleFromCountry(countryCode)
+  const dictionary = await getDictionary(locale)
+  const t = createTranslator(dictionary)
+
+  const displayTitle = title || t("bundles.featuredBundles")
+  const displayDescription = description || t("bundles.featuredDescription")
+
   const region = await getRegion(countryCode)
   
   if (!region) {
@@ -36,12 +45,12 @@ export default async function FeaturedBundles({
       <div className="flex items-center justify-between mb-8">
         <div>
           <Heading level="h2" className="text-2xl font-medium mb-2">
-            {title}
+            {displayTitle}
           </Heading>
-          <Text className="text-ui-fg-subtle">{description}</Text>
+          <Text className="text-ui-fg-subtle">{displayDescription}</Text>
         </div>
         {allBundles.length > limit && (
-          <InteractiveLink href="/bundles">View all bundles</InteractiveLink>
+          <InteractiveLink href="/bundles">{t("bundles.viewAllBundles")}</InteractiveLink>
         )}
       </div>
 

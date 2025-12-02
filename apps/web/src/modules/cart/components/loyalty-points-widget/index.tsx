@@ -6,6 +6,7 @@ import { Button } from "@medusajs/ui"
 import { applyLoyaltyPoints, removeLoyaltyPoints } from "@lib/data/loyalty"
 import { HttpTypes } from "@medusajs/types"
 import Spinner from "@modules/common/icons/spinner"
+import { useTranslation } from "@lib/i18n"
 
 type LoyaltyPointsWidgetProps = {
   cart: HttpTypes.StoreCart & {
@@ -25,6 +26,7 @@ export default function LoyaltyPointsWidget({
   cart,
   loyaltyPoints,
 }: LoyaltyPointsWidgetProps) {
+  const { t } = useTranslation()
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -98,7 +100,7 @@ export default function LoyaltyPointsWidget({
       await applyLoyaltyPoints(cart.id)
       router.refresh()
     } catch (err: any) {
-      const errorMessage = err.message || "Failed to apply loyalty points"
+      const errorMessage = err.message || t("loyalty.failedToApply")
       if (!errorMessage.toLowerCase().includes("already applied")) {
         setError(errorMessage)
       } else {
@@ -117,7 +119,7 @@ export default function LoyaltyPointsWidget({
       await removeLoyaltyPoints(cart.id)
       router.refresh()
     } catch (err: any) {
-      setError(err.message || "Failed to remove loyalty points")
+      setError(err.message || t("loyalty.failedToRemove"))
     } finally {
       setLoading(false)
     }
@@ -144,7 +146,7 @@ export default function LoyaltyPointsWidget({
       {!isLoyaltyApplied ? (
         <>
           <div className="flex items-center justify-between text-small-regular">
-            <span className="text-ui-fg-base">Available Points:</span>
+            <span className="text-ui-fg-base">{t("loyalty.availablePoints")}</span>
             <span className="font-semibold">
               {formatNumber(loyaltyPoints)} ({formatPrice(loyaltyPoints * config.redemption_rate)})
             </span>
@@ -158,17 +160,17 @@ export default function LoyaltyPointsWidget({
                 className="w-full"
                 data-testid="apply-loyalty-button"
               >
-                {loading ? <Spinner /> : "Use Points"}
+                {loading ? <Spinner /> : t("loyalty.usePoints")}
               </Button>
               <p className="text-xs text-ui-fg-subtle text-center">
-                Redeem up to {formatNumber(maxUsablePoints)} points ({formatPrice(maxUsablePoints * config.redemption_rate)})
+                {t("loyalty.redeemUpTo", { points: formatNumber(maxUsablePoints), value: formatPrice(maxUsablePoints * config.redemption_rate) })}
               </p>
             </>
           ) : (
             <p className="text-xs text-ui-fg-subtle text-center">
               {!meetsMinimum
-                ? `Minimum ${config.min_points_redemption} points required`
-                : "Cart total too low to use points"}
+                ? t("loyalty.minimumRequired", { min: config.min_points_redemption })
+                : t("loyalty.cartTotalTooLow")}
             </p>
           )}
         </>
@@ -177,10 +179,10 @@ export default function LoyaltyPointsWidget({
           <div className="flex items-center justify-between bg-green-50 dark:bg-green-900/20 p-3 rounded-lg">
             <div className="flex flex-col gap-y-1">
               <span className="text-small-semi text-green-700 dark:text-green-400">
-                ✓ Loyalty Points Applied
+                ✓ {t("loyalty.pointsApplied")}
               </span>
               <span className="text-xs text-ui-fg-subtle">
-                Using {formatNumber(pointsUsed)} points
+                {t("loyalty.usingPoints", { points: formatNumber(pointsUsed) })}
               </span>
             </div>
             <span className="font-semibold text-green-700 dark:text-green-400">
@@ -194,7 +196,7 @@ export default function LoyaltyPointsWidget({
             className="w-full"
             data-testid="remove-loyalty-button"
           >
-            {loading ? <Spinner /> : "Remove Discount"}
+            {loading ? <Spinner /> : t("loyalty.removeDiscount")}
           </Button>
         </>
       )}

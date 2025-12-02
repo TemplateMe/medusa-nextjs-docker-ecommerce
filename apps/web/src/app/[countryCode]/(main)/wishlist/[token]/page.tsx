@@ -4,6 +4,7 @@ import { Heading, Text } from "@medusajs/ui"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import Thumbnail from "@modules/products/components/thumbnail"
 import { convertToLocale } from "@lib/util/money"
+import { getDictionary, getLocaleFromCountry, createTranslator } from "@lib/i18n"
 
 export const metadata: Metadata = {
   title: "Shared Wishlist",
@@ -20,6 +21,9 @@ export default async function SharedWishlistPage({
   params: Promise<{ token: string; countryCode: string }>
 }) {
   const { token, countryCode } = await params
+  const locale = getLocaleFromCountry(countryCode)
+  const dictionary = await getDictionary(locale)
+  const t = createTranslator(dictionary)
   const wishlist = await retrieveSharedWishlist(token)
 
   // If wishlist not found or invalid token
@@ -31,11 +35,10 @@ export default async function SharedWishlistPage({
       >
         <div className="flex flex-col gap-y-2">
           <Heading level="h1" className="text-2xl-semi">
-            Wishlist Not Found
+            {t("wishlist.notFound")}
           </Heading>
           <Text className="text-base-regular text-ui-fg-subtle">
-            The wishlist you&apos;re looking for doesn&apos;t exist or the
-            link has expired.
+            {t("wishlist.notFoundDescription")}
           </Text>
         </div>
         <div>
@@ -43,7 +46,7 @@ export default async function SharedWishlistPage({
             href="/"
             className="text-base-regular text-ui-fg-interactive hover:underline"
           >
-            Continue shopping
+            {t("common.continueShopping")}
           </LocalizedClientLink>
         </div>
       </div>
@@ -60,10 +63,10 @@ export default async function SharedWishlistPage({
       {/* Header */}
       <div className="flex flex-col gap-y-2">
         <Heading level="h1" className="text-2xl-semi">
-          Shared Wishlist
+          {t("wishlist.sharedWishlist")}
         </Heading>
         <Text className="text-base-regular text-ui-fg-subtle">
-          {items.length} {items.length === 1 ? "item" : "items"}
+          {t("wishlist.itemsCount", { count: items.length.toString(), itemText: items.length === 1 ? t("orders.item") : t("orders.items") })}
         </Text>
       </div>
 
@@ -71,7 +74,7 @@ export default async function SharedWishlistPage({
       {items.length === 0 ? (
         <div>
           <Text className="text-base-regular text-ui-fg-subtle">
-            This wishlist is empty.
+            {t("wishlist.isEmpty")}
           </Text>
         </div>
       ) : (
@@ -132,7 +135,7 @@ export default async function SharedWishlistPage({
                       href={`/products/${product.handle}`}
                       className="text-base-regular text-ui-fg-interactive hover:underline"
                     >
-                      View product
+                      {t("products.viewProduct")}
                     </LocalizedClientLink>
                   </div>
                 </div>

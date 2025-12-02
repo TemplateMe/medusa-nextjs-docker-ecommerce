@@ -7,6 +7,7 @@ import Thumbnail from "@modules/products/components/thumbnail"
 import { useState } from "react"
 import { removeFromWishlist } from "@lib/data/wishlist"
 import { convertToLocale } from "@lib/util/money"
+import { useTranslation } from "@lib/i18n"
 
 type WishlistItemProps = {
   item: any
@@ -19,6 +20,7 @@ type WishlistItemProps = {
  */
 const WishlistItem = ({ item, countryCode }: WishlistItemProps) => {
   const [removing, setRemoving] = useState(false)
+  const { t } = useTranslation()
 
   const handleRemove = async () => {
     setRemoving(true)
@@ -40,7 +42,7 @@ const WishlistItem = ({ item, countryCode }: WishlistItemProps) => {
         <div className="w-[122px] h-[122px] bg-gray-100 rounded-md" />
         <div className="flex flex-col justify-between">
           <div className="flex flex-col">
-            <span className="text-gray-500">Product not available</span>
+            <span className="text-gray-500">{t("wishlist.productNotAvailable")}</span>
           </div>
           <Button
             variant="secondary"
@@ -49,7 +51,7 @@ const WishlistItem = ({ item, countryCode }: WishlistItemProps) => {
             className="w-fit"
           >
             <Trash size={16} />
-            <span>Remove</span>
+            <span>{t("account.remove")}</span>
           </Button>
         </div>
       </div>
@@ -107,7 +109,7 @@ const WishlistItem = ({ item, countryCode }: WishlistItemProps) => {
             data-testid="remove-from-wishlist-button"
           >
             <Trash size={16} />
-            <span>Remove</span>
+            <span>{t("account.remove")}</span>
           </Button>
         </div>
       </div>

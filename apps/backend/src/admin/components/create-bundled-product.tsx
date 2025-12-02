@@ -11,8 +11,10 @@ import { useState, useRef, useCallback, useMemo } from "react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { sdk } from "../lib/sdk"
 import { HttpTypes } from "@medusajs/framework/types"
+import { useTranslation } from "react-i18next"
 
 const CreateBundledProduct = () => {
+  const { t } = useTranslation()
   const [open, setOpen] = useState(false)
   const [title, setTitle] = useState("")
   const [items, setItems] = useState<{
@@ -103,40 +105,40 @@ const CreateBundledProduct = () => {
         }))
       })
       setOpen(false)
-      toast.success("Bundled product created successfully")
+      toast.success(t("bundles.createSuccess"))
       queryClient.invalidateQueries({
         queryKey: ["bundled-products"]
       })
       setTitle("")
       setItems([{ product_id: undefined, quantity: 1 }])
     } catch (error) {
-      toast.error("Failed to create bundled product")
+      toast.error(t("bundles.createError"))
     }
   }
 
   return (
     <FocusModal open={open} onOpenChange={setOpen}>
       <FocusModal.Trigger asChild>
-        <Button variant="primary">Create</Button>
+        <Button variant="primary">{t("common.create")}</Button>
       </FocusModal.Trigger>
       <FocusModal.Content>
         <FocusModal.Header>
           <div className="flex items-center justify-end gap-x-2">
-            <Heading level={"h1"}>Create Bundled Product</Heading>
+            <Heading level={"h1"}>{t("bundles.createBundle")}</Heading>
           </div>
         </FocusModal.Header>
         <FocusModal.Body>
           <div className="flex flex-1 flex-col items-center overflow-y-auto">
             <div className="mx-auto flex w-full max-w-[720px] flex-col gap-y-8 px-2 py-16">
               <div>
-                <Label>Bundle Title</Label>
+                <Label>{t("bundles.bundleTitle")}</Label>
                 <Input
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                 />
               </div>
               <div>
-                <Heading level={"h2"}>Bundle Items</Heading>
+                <Heading level={"h2"}>{t("bundles.bundleItems")}</Heading>
                 {items.map((item, index) => (
                   <BundledProductItem
                     key={index}
@@ -157,7 +159,7 @@ const CreateBundledProduct = () => {
                     ])
                   }
                 >
-                  Add Item
+                  {t("bundles.addItem")}
                 </Button>
               </div>
             </div>
@@ -166,14 +168,14 @@ const CreateBundledProduct = () => {
         <FocusModal.Footer>
           <div className="flex items-center justify-end gap-x-2">
             <Button variant="secondary" onClick={() => setOpen(false)}>
-              Cancel
+              {t("common.cancel")}
             </Button>
             <Button
               variant="primary"
               onClick={handleCreate}
               isLoading={isCreating}
             >
-              Create Bundle
+              {t("bundles.createBundle")}
             </Button>
           </div>
         </FocusModal.Footer>
@@ -207,6 +209,7 @@ const BundledProductItem = ({
   fetchMoreProducts, 
   hasNextPage
 }: BundledProductItemProps) => {
+  const { t } = useTranslation()
   const observer = useRef(
     new IntersectionObserver(
       (entries) => {
@@ -239,7 +242,7 @@ const BundledProductItem = ({
 
   return (
     <div className="my-2">
-      <Heading level={"h3"} className="mb-2">Item {index + 1}</Heading>
+      <Heading level={"h3"} className="mb-2">{t("bundles.itemNumber", { number: index + 1 })}</Heading>
         <Select 
           value={item.product_id} 
           onValueChange={(value) => 
@@ -256,7 +259,7 @@ const BundledProductItem = ({
           }
         >
           <Select.Trigger>
-            <Select.Value placeholder="Select Product" />
+            <Select.Value placeholder={t("bundles.selectProduct")} />
           </Select.Trigger>
           <Select.Content>
             {products?.map((product, productIndex) => (
@@ -275,10 +278,10 @@ const BundledProductItem = ({
           </Select.Content>
         </Select>
         <div className="flex items-center gap-x-2 [&_div]:flex-1">
-          <Label>Quantity</Label>
+          <Label>{t("common.quantity")}</Label>
           <Input
             type="number"
-            placeholder="Quantity"
+            placeholder={t("common.quantity")}
             className="w-full mt-1 rounded-md border border-gray-200 p-2"
             value={item.quantity}
             onChange={(e) => 

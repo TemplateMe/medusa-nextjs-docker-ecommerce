@@ -6,6 +6,7 @@ import LocalizedClientLink from "@modules/common/components/localized-client-lin
 import { format } from "date-fns"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
+import { useTranslation } from "@lib/i18n"
 
 type SubscriptionDetailsTemplateProps = {
     subscription: Subscription
@@ -16,6 +17,7 @@ const SubscriptionDetailsTemplate = ({
 }: SubscriptionDetailsTemplateProps) => {
     const router = useRouter()
     const [cancelling, setCancelling] = useState(false)
+    const { t } = useTranslation()
 
     const handleCancel = async () => {
         setCancelling(true)
@@ -36,6 +38,27 @@ const SubscriptionDetailsTemplate = ({
         metadata,
     } = subscription
 
+    const getStatusText = () => {
+        switch (status) {
+            case "active":
+                return t("subscriptions.statusActive")
+            case "canceled":
+                return t("subscriptions.statusCanceled")
+            case "failed":
+                return t("subscriptions.statusFailed")
+            case "expired":
+                return t("subscriptions.statusExpired")
+            default:
+                return String(status).charAt(0).toUpperCase() + String(status).slice(1)
+        }
+    }
+
+    const getIntervalText = () => {
+        return interval === "monthly" 
+            ? t("subscriptions.monthly") 
+            : t("subscriptions.yearly")
+    }
+
     return (
         <div className="w-full" data-testid="subscription-details-page">
             <div className="mb-8 flex flex-col gap-y-4">
@@ -43,11 +66,11 @@ const SubscriptionDetailsTemplate = ({
                     href="/account/subscriptions"
                     className="text-small-regular text-ui-fg-subtle hover:text-ui-fg-base mb-2"
                 >
-                    &larr; Back to Subscriptions
+                    &larr; {t("subscriptions.backToSubscriptions")}
                 </LocalizedClientLink>
                 <div className="flex items-center justify-between">
                     <Heading level="h1" className="text-2xl-semi">
-                        Subscription Details
+                        {t("subscriptions.subscriptionDetails")}
                     </Heading>
                     <span
                         className={clx("text-small-regular px-2 py-1 rounded-full", {
@@ -56,7 +79,7 @@ const SubscriptionDetailsTemplate = ({
                             "bg-gray-100 text-gray-800": status === "expired",
                         })}
                     >
-                        {status.charAt(0).toUpperCase() + status.slice(1)}
+                        {getStatusText()}
                     </span>
                 </div>
             </div>
@@ -65,16 +88,16 @@ const SubscriptionDetailsTemplate = ({
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <Text className="text-ui-fg-subtle text-small-regular mb-1">
-                            Interval
+                            {t("subscriptions.interval")}
                         </Text>
                         <Text className="text-ui-fg-base font-medium">
-                            {interval === "monthly" ? "Monthly" : "Yearly"} (Every {period}{" "}
-                            {interval === "monthly" ? "month" : "year"})
+                            {getIntervalText()} ({t("subscriptions.every")} {period}{" "}
+                            {interval === "monthly" ? t("subscriptions.month") : t("subscriptions.year")})
                         </Text>
                     </div>
                     <div>
                         <Text className="text-ui-fg-subtle text-small-regular mb-1">
-                            Start Date
+                            {t("subscriptions.startDate")}
                         </Text>
                         <Text className="text-ui-fg-base font-medium">
                             {format(new Date(subscription_date), "MMMM d, yyyy")}
@@ -82,7 +105,7 @@ const SubscriptionDetailsTemplate = ({
                     </div>
                     <div>
                         <Text className="text-ui-fg-subtle text-small-regular mb-1">
-                            Next Order Date
+                            {t("subscriptions.nextOrderDate")}
                         </Text>
                         <Text className="text-ui-fg-base font-medium">
                             {next_order_date
@@ -92,7 +115,7 @@ const SubscriptionDetailsTemplate = ({
                     </div>
                     <div>
                         <Text className="text-ui-fg-subtle text-small-regular mb-1">
-                            Expiration Date
+                            {t("subscriptions.expirationDate")}
                         </Text>
                         <Text className="text-ui-fg-base font-medium">
                             {expiration_date
@@ -105,11 +128,11 @@ const SubscriptionDetailsTemplate = ({
                 {status === "active" && (
                     <div className="border-t pt-6 mt-2">
                         <Heading level="h2" className="text-lg-semi mb-4">
-                            Actions
+                            {t("subscriptions.actions")}
                         </Heading>
                         <div className="flex flex-col gap-y-4">
                             <Text className="text-small-regular text-ui-fg-subtle">
-                                If you cancel your subscription, no further orders will be placed.
+                                {t("subscriptions.cancelWarning")}
                             </Text>
                             <Button
                                 variant="danger"
@@ -117,7 +140,7 @@ const SubscriptionDetailsTemplate = ({
                                 onClick={handleCancel}
                                 isLoading={cancelling}
                             >
-                                Cancel Subscription
+                                {t("subscriptions.cancelSubscription")}
                             </Button>
                         </div>
                     </div>

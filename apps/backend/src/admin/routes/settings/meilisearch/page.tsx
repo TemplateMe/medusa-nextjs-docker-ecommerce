@@ -2,19 +2,21 @@ import { Container, Heading, Button, toast } from "@medusajs/ui"
 import { useMutation } from "@tanstack/react-query"
 import { sdk } from "../../../lib/sdk"
 import { defineRouteConfig } from "@medusajs/admin-sdk"
+import { useTranslation } from "react-i18next"
 
 const MeilisearchPage = () => {
+  const { t } = useTranslation()
   const { mutate, isPending } = useMutation({
     mutationFn: () => 
       sdk.client.fetch("/admin/meilisearch/sync", {
         method: "POST"
       }),
     onSuccess: () => {
-      toast.success("Successfully triggered data sync to Meilisearch") 
+      toast.success(t("meilisearch.syncSuccess")) 
     },
     onError: (err) => {
       console.error(err)
-      toast.error("Failed to sync data to Meilisearch") 
+      toast.error(t("meilisearch.syncError")) 
     }
   })
 
@@ -25,7 +27,7 @@ const MeilisearchPage = () => {
   return (
     <Container className="divide-y p-0">
       <div className="flex items-center justify-between px-6 py-4">
-        <Heading level="h2">Meilisearch Sync</Heading>
+        <Heading level="h2">{t("meilisearch.title")}</Heading>
       </div>
       <div className="px-6 py-8">
         <Button 
@@ -33,7 +35,7 @@ const MeilisearchPage = () => {
           onClick={handleSync}
           isLoading={isPending}
         >
-          Sync Data to Meilisearch
+          {t("meilisearch.syncButton")}
         </Button>
       </div>
     </Container>

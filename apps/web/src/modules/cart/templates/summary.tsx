@@ -8,6 +8,7 @@ import DiscountCode from "@modules/checkout/components/discount-code"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { HttpTypes } from "@medusajs/types"
 import LoyaltyPointsWidget from "@modules/cart/components/loyalty-points-widget"
+import { useTranslation } from "@lib/i18n"
 
 type SummaryProps = {
   cart: HttpTypes.StoreCart & {
@@ -28,11 +29,12 @@ function getCheckoutStep(cart: HttpTypes.StoreCart) {
 
 const Summary = ({ cart, loyaltyPoints = 0 }: SummaryProps) => {
   const step = getCheckoutStep(cart)
+  const { t } = useTranslation()
 
   return (
     <div className="flex flex-col gap-y-4">
       <Heading level="h2" className="text-[2rem] leading-[2.75rem]">
-        Summary
+        {t("cart.summary")}
       </Heading>
       <DiscountCode cart={cart} />
       {loyaltyPoints > 0 && (
@@ -47,7 +49,7 @@ const Summary = ({ cart, loyaltyPoints = 0 }: SummaryProps) => {
         href={"/checkout?step=" + step}
         data-testid="checkout-button"
       >
-        <Button className="w-full h-10">Go to checkout</Button>
+        <Button className="w-full h-10">{t("cart.checkout")}</Button>
       </LocalizedClientLink>
     </div>
   )

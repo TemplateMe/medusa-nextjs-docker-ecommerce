@@ -3,18 +3,21 @@
 import React from "react"
 import StarRating from "../star-rating"
 import { Review } from "@lib/data/reviews"
+import { useTranslation } from "@lib/i18n"
 
 type ReviewCardProps = {
   review: Review
 }
 
 const ReviewCard: React.FC<ReviewCardProps> = ({ review }) => {
+  const { locale } = useTranslation()
   const reviewerName = `${review.first_name} ${review.last_name}`
   
-  // Format date in a way that's consistent across server/client
+  // Format date using the current locale
   const formatReviewDate = (dateString: string) => {
     const date = new Date(dateString)
-    return date.toLocaleDateString("en-US", {
+    const localeCode = locale === "bg" ? "bg-BG" : "en-US"
+    return date.toLocaleDateString(localeCode, {
       year: "numeric",
       month: "long",
       day: "numeric",

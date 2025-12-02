@@ -7,8 +7,10 @@ import { useParams, Link } from "react-router-dom"
 import { SubscriptionData } from "../../../types/index.js"
 import { useQuery } from "@tanstack/react-query"
 import { sdk } from "../../../lib/sdk.js"
+import { useTranslation } from "react-i18next"
 
 const SubscriptionPage = () => {
+  const { t } = useTranslation()
   const { id } = useParams()
   const { data, isLoading } = useQuery<{
     subscription: SubscriptionData
@@ -19,16 +21,16 @@ const SubscriptionPage = () => {
 
   return (
     <Container>
-      {isLoading && <span>Loading...</span>}
+      {isLoading && <span>{t("common.loading")}</span>}
       {data?.subscription && (
         <>
-          <Heading level="h1">Orders of Subscription #{data.subscription.id}</Heading>
+          <Heading level="h1">{t("subscriptions.ordersOfSubscription", { id: data.subscription.id })}</Heading>
           <Table>
             <Table.Header>
               <Table.Row>
                 <Table.HeaderCell>#</Table.HeaderCell>
-                <Table.HeaderCell>Date</Table.HeaderCell>
-                <Table.HeaderCell>View Order</Table.HeaderCell>
+                <Table.HeaderCell>{t("common.date")}</Table.HeaderCell>
+                <Table.HeaderCell>{t("subscriptions.viewOrder")}</Table.HeaderCell>
               </Table.Row>
             </Table.Header>
             <Table.Body>
@@ -38,7 +40,7 @@ const SubscriptionPage = () => {
                   <Table.Cell>{(new Date(order.created_at)).toDateString()}</Table.Cell>
                   <Table.Cell>
                     <Link to={`/orders/${order.id}`}>
-                      View Order
+                      {t("subscriptions.viewOrder")}
                     </Link>
                   </Table.Cell>
                 </Table.Row>

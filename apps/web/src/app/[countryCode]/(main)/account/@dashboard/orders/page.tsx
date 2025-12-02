@@ -6,6 +6,7 @@ import { listOrders } from "@lib/data/orders"
 import { retrieveCustomer } from "@lib/data/customer"
 import Divider from "@modules/common/components/divider"
 import TransferRequestForm from "@modules/account/components/transfer-request-form"
+import { getDictionary, createTranslator, getLocaleFromCountry } from "@lib/i18n"
 
 export const metadata: Metadata = {
   title: "Orders",
@@ -14,7 +15,12 @@ export const metadata: Metadata = {
 
 export const dynamic = "force-dynamic"
 
-export default async function Orders() {
+export default async function Orders({
+  params,
+}: {
+  params: Promise<{ countryCode: string }>
+}) {
+  const { countryCode } = await params
   // Check if customer is authenticated first
   const customer = await retrieveCustomer().catch(() => null)
   
@@ -28,13 +34,16 @@ export default async function Orders() {
     notFound()
   }
 
+  const locale = getLocaleFromCountry(countryCode)
+  const dictionary = await getDictionary(locale)
+  const t = createTranslator(dictionary)
+
   return (
     <div className="w-full" data-testid="orders-page-wrapper">
       <div className="mb-8 flex flex-col gap-y-4">
-        <h1 className="text-2xl-semi">Orders</h1>
+        <h1 className="text-2xl-semi">{t("orders.title")}</h1>
         <p className="text-base-regular">
-          View your previous orders and their status. You can also create
-          returns or exchanges for your orders if needed.
+          {t("orders.ordersDescription")}
         </p>
       </div>
       <div>

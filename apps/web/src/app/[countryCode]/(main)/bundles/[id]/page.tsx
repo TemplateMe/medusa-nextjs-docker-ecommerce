@@ -4,6 +4,7 @@ import { notFound } from "next/navigation"
 import BundleDetail from "@modules/products/components/bundle-detail"
 import ImageGallery from "@modules/products/components/image-gallery"
 import { Metadata } from "next"
+import { getDictionary, createTranslator, getLocaleFromCountry } from "@lib/i18n"
 
 type Props = {
   params: Promise<{ countryCode: string; id: string }>
@@ -38,6 +39,10 @@ export default async function BundlePage(props: Props) {
     return notFound()
   }
 
+  const locale = getLocaleFromCountry(countryCode)
+  const dictionary = await getDictionary(locale)
+  const t = createTranslator(dictionary)
+
   // Get images from the bundle's main product
   const images = bundle.product?.images || []
 
@@ -51,7 +56,7 @@ export default async function BundlePage(props: Props) {
               <ImageGallery images={images} />
             ) : (
               <div className="aspect-square bg-ui-bg-subtle rounded-lg flex items-center justify-center">
-                <span className="text-ui-fg-muted">No image available</span>
+                <span className="text-ui-fg-muted">{t("products.noImageAvailable")}</span>
               </div>
             )}
           </div>

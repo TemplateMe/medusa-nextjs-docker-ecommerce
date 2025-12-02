@@ -18,6 +18,7 @@ import { useMemo, useState } from "react"
 import { sdk } from "../../lib/sdk"
 import { HttpTypes } from "@medusajs/framework/types"
 import { Link } from "react-router-dom"
+import { useTranslation } from "react-i18next"
 
 type Review = {
   id: string
@@ -36,98 +37,12 @@ type Review = {
 
 const columnHelper = createDataTableColumnHelper<Review>()
 
-const columns = [
-  columnHelper.select(),
-  columnHelper.accessor("id", {
-    header: "ID",
-  }),
-  columnHelper.accessor("title", {
-    header: "Title",
-  }),
-  columnHelper.accessor("rating", {
-    header: "Rating", 
-  }),
-  columnHelper.accessor("content", {
-    header: "Content"
-  }),
-  columnHelper.accessor("status", {
-    header: "Status",
-    cell: ({ row }) => {
-      const color = row.original.status === "approved" ? 
-        "green" : row.original.status === "rejected" 
-        ? "red" : "grey"
-      return (
-        <StatusBadge color={color}>
-          {row.original.status.charAt(0).toUpperCase() + row.original.status.slice(1)}
-          </StatusBadge>
-      )
-    }
-  }),
-  columnHelper.accessor("product", {
-    header: "Product",
-    cell: ({ row }) => {
-      return (
-        <Link
-          to={`/products/${row.original.product_id}`}
-        >
-          {row.original.product?.title}
-        </Link>
-      )
-    }
-  }),
-]
-
 const commandHelper = createDataTableCommandHelper()
-
-const useCommands = (refetch: () => void) => {
-  return [
-    commandHelper.command({
-      label: "Approve",
-      shortcut: "A",
-      action: async (selection) => {
-        const reviewsToApproveIds = Object.keys(selection)
-
-        sdk.client.fetch("/admin/reviews/status", {
-          method: "POST",
-          body: {
-            ids: reviewsToApproveIds,
-            status: "approved"
-          }
-        }).then(() => {
-          toast.success("Reviews approved")
-          refetch()
-        }).catch(() => {
-          toast.error("Failed to approve reviews")
-        })
-      }
-    }),
-    commandHelper.command({
-      label: "Reject",
-      shortcut: "R",
-      action: async (selection) => {
-        const reviewsToRejectIds = Object.keys(selection)
-
-        sdk.client.fetch("/admin/reviews/status", {
-          method: "POST",
-          body: {
-            ids: reviewsToRejectIds,
-            status: "rejected"
-          }
-        }).then(() => {
-          toast.success("Reviews rejected")
-          refetch()
-        }).catch(() => {
-          toast.error("Failed to reject reviews")
-        })
-      }
-    })
-  ]
-}
-
 
 const limit = 15
 
 const ReviewsPage = () => {
+  const { t } = useTranslation()
   const [pagination, setPagination] = useState<DataTablePaginationState>({
     pageSize: limit,
     pageIndex: 0
@@ -154,7 +69,90 @@ const ReviewsPage = () => {
     })
   })
 
-  const commands = useCommands(refetch)
+  const columns = useMemo(() => [
+    columnHelper.select(),
+    columnHelper.accessor("id", {
+      header: t("common.id"),
+    }),
+    columnHelper.accessor("title", {
+      header: t("common.title"),
+    }),
+    columnHelper.accessor("rating", {
+      header: t("reviews.rating"), 
+    }),
+    columnHelper.accessor("content", {
+      header: t("reviews.content")
+    }),
+    columnHelper.accessor("status", {
+      header: t("common.status"),
+      cell: ({ row }) => {
+        const status = row.original.status
+        const color = status === "approved" ? "green" : status === "rejected" ? "red" : "grey"
+        const label = status === "approved" ? t("reviews.approved") : 
+                      status === "rejected" ? t("reviews.rejected") : t("common.pending")
+        return (
+          <StatusBadge color={color}>
+            {label}
+          </StatusBadge>
+        )
+      }
+    }),
+    columnHelper.accessor("product", {
+      header: t("common.product"),
+      cell: ({ row }) => {
+        return (
+          <Link
+            to={`/products/${row.original.product_id}`}
+          >
+            {row.original.product?.title}
+          </Link>
+        )
+      }
+    }),
+  ], [t])
+
+  const commands = useMemo(() => [
+    commandHelper.command({
+      label: t("reviews.approve"),
+      shortcut: "A",
+      action: async (selection) => {
+        const reviewsToApproveIds = Object.keys(selection)
+
+        sdk.client.fetch("/admin/reviews/status", {
+          method: "POST",
+          body: {
+            ids: reviewsToApproveIds,
+            status: "approved"
+          }
+        }).then(() => {
+          toast.success(t("reviews.approveSuccess"))
+          refetch()
+        }).catch(() => {
+          toast.error(t("reviews.approveError"))
+        })
+      }
+    }),
+    commandHelper.command({
+      label: t("reviews.reject"),
+      shortcut: "R",
+      action: async (selection) => {
+        const reviewsToRejectIds = Object.keys(selection)
+
+        sdk.client.fetch("/admin/reviews/status", {
+          method: "POST",
+          body: {
+            ids: reviewsToRejectIds,
+            status: "rejected"
+          }
+        }).then(() => {
+          toast.success(t("reviews.rejectSuccess"))
+          refetch()
+        }).catch(() => {
+          toast.error(t("reviews.rejectError"))
+        })
+      }
+    })
+  ], [t, refetch])
 
   const table = useDataTable({
     columns,
@@ -178,12 +176,18 @@ const ReviewsPage = () => {
       <DataTable instance={table}>
         <DataTable.Toolbar className="flex flex-col items-start justify-between gap-2 md:flex-row md:items-center">
           <Heading>
-            Reviews
+            {t("reviews.title")}
           </Heading>
         </DataTable.Toolbar>
         <DataTable.Table />
-        <DataTable.Pagination />
-        <DataTable.CommandBar selectedLabel={(count) => `${count} selected`} />
+        <DataTable.Pagination translations={{
+          of: t("general.of"),
+          results: t("general.results"),
+          pages: t("general.pages"),
+          prev: t("general.prev"),
+          next: t("general.next"),
+        }} />
+        <DataTable.CommandBar selectedLabel={(count) => t("reviews.selectedCount", { count })} />
       </DataTable>
       <Toaster />
     </Container>
@@ -196,4 +200,3 @@ export const config = defineRouteConfig({
 })
 
 export default ReviewsPage
-

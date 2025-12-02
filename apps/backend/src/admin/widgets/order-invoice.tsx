@@ -3,8 +3,10 @@ import { Button, Container, Heading, Text, toast } from "@medusajs/ui"
 import { AdminOrder, DetailWidgetProps } from "@medusajs/framework/types"
 import { sdk } from "../lib/sdk"
 import { useState } from "react"
+import { useTranslation } from "react-i18next"
 
 const OrderInvoiceWidget = ({ data: order }: DetailWidgetProps<AdminOrder>) => {
+  const { t } = useTranslation()
   const [isDownloading, setIsDownloading] = useState(false)
 
   const downloadInvoice = async () => {
@@ -28,9 +30,9 @@ const OrderInvoiceWidget = ({ data: order }: DetailWidgetProps<AdminOrder>) => {
       window.URL.revokeObjectURL(url)
       document.body.removeChild(a)
       setIsDownloading(false)
-      toast.success("Invoice generated and downloaded successfully")
+      toast.success(t("invoice.successMessage"))
     } catch (error) {
-      toast.error(`Failed to generate invoice: ${error}`)
+      toast.error(`${t("invoice.errorMessage")}: ${error}`)
       setIsDownloading(false)
     }
   }
@@ -39,9 +41,9 @@ const OrderInvoiceWidget = ({ data: order }: DetailWidgetProps<AdminOrder>) => {
     <Container className="divide-y p-0">
       <div className="flex items-center justify-between px-6 py-4">
         <div>
-          <Heading level="h2">Invoice</Heading>
+          <Heading level="h2">{t("invoice.title")}</Heading>
           <Text size="small" className="text-ui-fg-subtle">
-            Generate and download invoice for this order
+            {t("invoice.description")}
           </Text>
         </div>
       </div>
@@ -53,7 +55,7 @@ const OrderInvoiceWidget = ({ data: order }: DetailWidgetProps<AdminOrder>) => {
           onClick={downloadInvoice}
           isLoading={isDownloading}
         >
-          Download Invoice
+          {t("invoice.downloadButton")}
         </Button>
       </div>
     </Container>
@@ -64,4 +66,4 @@ export const config = defineWidgetConfig({
   zone: "order.details.side.before",
 })
 
-export default OrderInvoiceWidget 
+export default OrderInvoiceWidget

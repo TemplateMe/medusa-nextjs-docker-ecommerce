@@ -1,7 +1,10 @@
+"use client"
+
 import { Preorder, PreorderStatus } from "../../../../types/preorder"
 import { formatPreorderDate } from "@lib/util/preorder"
 import { convertToLocale } from "@lib/util/money"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
+import { useTranslation } from "@lib/i18n"
 
 type PreorderCardProps = {
   preorder: Preorder & {
@@ -26,6 +29,7 @@ export default function PreorderCard({
   preorder,
   countryCode,
 }: PreorderCardProps) {
+  const { t } = useTranslation()
   const product = preorder.item.product_variant?.product
   const variant = preorder.item.product_variant
   const availableDate = new Date(preorder.item.available_date)
@@ -35,19 +39,19 @@ export default function PreorderCard({
       case PreorderStatus.PENDING:
         return (
           <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-            Pending
+            {t("preorders.pending")}
           </span>
         )
       case PreorderStatus.FULFILLED:
         return (
           <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-            Fulfilled
+            {t("preorders.fulfilled")}
           </span>
         )
       case PreorderStatus.CANCELLED:
         return (
           <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-            Cancelled
+            {t("preorders.cancelled")}
           </span>
         )
       default:
@@ -86,7 +90,7 @@ export default function PreorderCard({
               
               {variant?.title && (
                 <p className="text-sm text-gray-500 mt-1">
-                  Variant: {variant.title}
+                  {t("preorders.variant")} {variant.title}
                 </p>
               )}
               
@@ -119,7 +123,7 @@ export default function PreorderCard({
                 d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
               />
             </svg>
-            <span>Expected: {formatPreorderDate(availableDate)}</span>
+            <span>{t("preorders.expected")} {formatPreorderDate(availableDate)}</span>
           </div>
           
           {preorder.order_id && (
@@ -128,7 +132,7 @@ export default function PreorderCard({
                 href={`/account/orders/details/${preorder.order_id}`}
                 className="text-sm text-blue-600 hover:text-blue-800"
               >
-                View Order →
+                {t("preorders.viewOrder")} →
               </LocalizedClientLink>
             </div>
           )}

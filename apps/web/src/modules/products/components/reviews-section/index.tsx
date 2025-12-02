@@ -5,6 +5,7 @@ import StarRating from "../star-rating"
 import ReviewCard from "../review-card"
 import ReviewForm from "../review-form"
 import { Review } from "@lib/data/reviews"
+import { useTranslation } from "@lib/i18n/client"
 
 type ReviewsSectionProps = {
   productId: string
@@ -21,6 +22,7 @@ const ReviewsSection: React.FC<ReviewsSectionProps> = ({
   reviews,
   ratingStats,
 }) => {
+  const { t } = useTranslation()
   const [showReviewForm, setShowReviewForm] = useState(false)
   const [sortBy, setSortBy] = useState<"recent" | "highest" | "lowest">(
     "recent"
@@ -45,11 +47,19 @@ const ReviewsSection: React.FC<ReviewsSectionProps> = ({
     return (count / ratingStats.totalReviews) * 100
   }
 
+  const getBasedOnText = () => {
+    const count = ratingStats.totalReviews
+    if (count === 1) {
+      return t("reviews.basedOn", { count })
+    }
+    return t("reviews.basedOnPlural", { count })
+  }
+
   return (
     <div className="content-container py-12" id="reviews">
       <div className="max-w-7xl mx-auto">
         <h2 className="text-3xl font-bold text-gray-900 mb-8">
-          Customer Reviews
+          {t("reviews.title")}
         </h2>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
@@ -68,8 +78,7 @@ const ReviewsSection: React.FC<ReviewsSectionProps> = ({
                   showValue={false}
                 />
                 <p className="text-sm text-gray-600 mt-2">
-                  Based on {ratingStats.totalReviews} review
-                  {ratingStats.totalReviews !== 1 ? "s" : ""}
+                  {getBasedOnText()}
                 </p>
               </div>
 
@@ -108,7 +117,7 @@ const ReviewsSection: React.FC<ReviewsSectionProps> = ({
                 onClick={() => setShowReviewForm(!showReviewForm)}
                 className="w-full mt-6 px-4 py-3 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-800 transition-colors"
               >
-                {showReviewForm ? "Cancel" : "Write a Review"}
+                {showReviewForm ? t("reviews.cancel") : t("reviews.writeReview")}
               </button>
             </div>
           </div>
@@ -128,14 +137,14 @@ const ReviewsSection: React.FC<ReviewsSectionProps> = ({
                   <>
                     <div className="flex items-center justify-between mb-6">
                       <h3 className="text-lg font-semibold text-gray-900">
-                        All Reviews ({reviews.length})
+                        {t("reviews.allReviews")} ({reviews.length})
                       </h3>
                       <div className="flex items-center gap-2">
                         <label
                           htmlFor="sort"
                           className="text-sm text-gray-600"
                         >
-                          Sort by:
+                          {t("reviews.sortBy")}
                         </label>
                         <select
                           id="sort"
@@ -147,9 +156,9 @@ const ReviewsSection: React.FC<ReviewsSectionProps> = ({
                           }
                           className="text-sm border border-gray-300 rounded-md px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-gray-900"
                         >
-                          <option value="recent">Most Recent</option>
-                          <option value="highest">Highest Rating</option>
-                          <option value="lowest">Lowest Rating</option>
+                          <option value="recent">{t("reviews.mostRecent")}</option>
+                          <option value="highest">{t("reviews.highestRating")}</option>
+                          <option value="lowest">{t("reviews.lowestRating")}</option>
                         </select>
                       </div>
                     </div>
@@ -178,16 +187,16 @@ const ReviewsSection: React.FC<ReviewsSectionProps> = ({
                       />
                     </svg>
                     <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                      No reviews yet
+                      {t("reviews.noReviews")}
                     </h3>
                     <p className="text-gray-600 mb-6">
-                      Be the first to share your experience with this product!
+                      {t("reviews.noReviewsDescription")}
                     </p>
                     <button
                       onClick={() => setShowReviewForm(true)}
                       className="px-6 py-3 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-800 transition-colors"
                     >
-                      Write the First Review
+                      {t("reviews.writeFirstReview")}
                     </button>
                   </div>
                 )}

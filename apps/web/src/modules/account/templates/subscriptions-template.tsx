@@ -1,20 +1,25 @@
+"use client"
+
 import { Subscription } from "@lib/data/subscriptions"
 import { Heading, Text } from "@medusajs/ui"
 import SubscriptionCard from "../components/subscription-card"
+import { useTranslation } from "@lib/i18n"
 
 type SubscriptionsTemplateProps = {
     subscriptions: Subscription[] | null
 }
 
 const SubscriptionsTemplate = ({ subscriptions }: SubscriptionsTemplateProps) => {
+    const { t } = useTranslation()
+
     return (
         <div className="w-full" data-testid="subscriptions-page">
             <div className="mb-8 flex flex-col gap-y-4">
                 <Heading level="h1" className="text-2xl-semi">
-                    Subscriptions
+                    {t("subscriptions.title")}
                 </Heading>
                 <Text className="text-base-regular">
-                    View and manage your active subscriptions.
+                    {t("subscriptions.description")}
                 </Text>
             </div>
             <div>
@@ -27,7 +32,7 @@ const SubscriptionsTemplate = ({ subscriptions }: SubscriptionsTemplateProps) =>
                 ) : (
                     <div className="flex flex-col items-center justify-center w-full h-full py-12">
                         <Text className="text-base-regular text-ui-fg-subtle">
-                            You don&apos;t have any subscriptions yet.
+                            {t("subscriptions.noSubscriptions")}
                         </Text>
                     </div>
                 )}

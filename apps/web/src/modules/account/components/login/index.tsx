@@ -5,6 +5,7 @@ import ErrorMessage from "@modules/checkout/components/error-message"
 import { SubmitButton } from "@modules/checkout/components/submit-button"
 import Input from "@modules/common/components/input"
 import { useActionState } from "react"
+import { useTranslation } from "@lib/i18n"
 
 type Props = {
   setCurrentView: (view: LOGIN_VIEW) => void
@@ -12,6 +13,7 @@ type Props = {
 
 const Login = ({ setCurrentView }: Props) => {
   const [message, formAction] = useActionState(login, null)
+  const { t } = useTranslation()
 
   const handleGoogleLogin = async () => {
     try {
@@ -35,9 +37,9 @@ const Login = ({ setCurrentView }: Props) => {
       className="max-w-sm w-full flex flex-col items-center"
       data-testid="login-page"
     >
-      <h1 className="text-large-semi uppercase mb-6">Welcome back</h1>
+      <h1 className="text-large-semi uppercase mb-6">{t("account.welcomeBack")}</h1>
       <p className="text-center text-base-regular text-ui-fg-base mb-8">
-        Sign in to access an enhanced shopping experience.
+        {t("account.signInDescription")}
       </p>
       
       {/* Google Login Button */}
@@ -52,28 +54,28 @@ const Login = ({ setCurrentView }: Props) => {
           <path d="M3.96409 10.7098C3.78409 10.1698 3.68182 9.59301 3.68182 8.99983C3.68182 8.40665 3.78409 7.82983 3.96409 7.28983V4.95801H0.957273C0.347727 6.17301 0 7.54756 0 8.99983C0 10.4521 0.347727 11.8266 0.957273 13.0416L3.96409 10.7098Z" fill="#FBBC05"/>
           <path d="M8.99976 3.57955C10.3211 3.57955 11.5075 4.03364 12.4402 4.92545L15.0216 2.34409C13.4629 0.891818 11.4257 0 8.99976 0C5.48158 0 2.43794 2.01682 0.957031 4.95818L3.96385 7.29C4.67158 5.16273 6.65567 3.57955 8.99976 3.57955Z" fill="#EA4335"/>
         </svg>
-        <span className="text-small-regular">Continue with Google</span>
+        <span className="text-small-regular">{t("account.continueWithGoogle")}</span>
       </button>
 
       <div className="w-full flex items-center gap-4 mb-6">
         <div className="flex-1 h-px bg-ui-border-base"></div>
-        <span className="text-small-regular text-ui-fg-subtle">OR</span>
+        <span className="text-small-regular text-ui-fg-subtle">{t("account.or")}</span>
         <div className="flex-1 h-px bg-ui-border-base"></div>
       </div>
 
       <form className="w-full" action={formAction}>
         <div className="flex flex-col w-full gap-y-2">
           <Input
-            label="Email"
+            label={t("account.email")}
             name="email"
             type="email"
-            title="Enter a valid email address."
+            title={t("checkout.enterValidEmail")}
             autoComplete="email"
             required
             data-testid="email-input"
           />
           <Input
-            label="Password"
+            label={t("account.password")}
             name="password"
             type="password"
             autoComplete="current-password"
@@ -83,17 +85,17 @@ const Login = ({ setCurrentView }: Props) => {
         </div>
         <ErrorMessage error={message} data-testid="login-error-message" />
         <SubmitButton data-testid="sign-in-button" className="w-full mt-6">
-          Sign in
+          {t("account.signIn")}
         </SubmitButton>
       </form>
       <span className="text-center text-ui-fg-base text-small-regular mt-6">
-        Not a member?{" "}
+        {t("account.notMember")}{" "}
         <button
           onClick={() => setCurrentView(LOGIN_VIEW.REGISTER)}
           className="underline"
           data-testid="register-button"
         >
-          Join us
+          {t("account.joinUs")}
         </button>
         .
       </span>

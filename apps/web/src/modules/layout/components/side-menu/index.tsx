@@ -8,17 +8,24 @@ import { Fragment } from "react"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import CountrySelect from "../country-select"
 import { HttpTypes } from "@medusajs/types"
+import { useTranslation } from "@lib/i18n"
 
-const SideMenuItems = {
-  Home: "/",
-  Store: "/store",
-  Bundles: "/bundles",
-  Account: "/account",
-  Cart: "/cart",
+interface SideMenuProps {
+  regions: HttpTypes.StoreRegion[] | null
+  dictionary: Record<string, any>
 }
 
-const SideMenu = ({ regions }: { regions: HttpTypes.StoreRegion[] | null }) => {
+const SideMenu = ({ regions }: SideMenuProps) => {
   const toggleState = useToggleState()
+  const { t } = useTranslation()
+
+  const SideMenuItems = {
+    [t("nav.home")]: "/",
+    [t("nav.products")]: "/store",
+    [t("nav.bundles")]: "/bundles",
+    [t("nav.account")]: "/account",
+    [t("nav.cart")]: "/cart",
+  }
 
   return (
     <div className="h-full">
@@ -31,7 +38,7 @@ const SideMenu = ({ regions }: { regions: HttpTypes.StoreRegion[] | null }) => {
                   data-testid="nav-menu-button"
                   className="relative h-full flex items-center transition-all ease-out duration-200 focus:outline-none hover:text-ui-fg-base"
                 >
-                  Menu
+                  {t("nav.menu")}
                 </Popover.Button>
               </div>
 
@@ -51,7 +58,7 @@ const SideMenu = ({ regions }: { regions: HttpTypes.StoreRegion[] | null }) => {
                     className="flex flex-col h-full bg-[rgba(3,7,18,0.5)] rounded-rounded justify-between p-6"
                   >
                     <div className="flex justify-end" id="xmark">
-                      <button data-testid="close-menu-button" onClick={close}>
+                      <button data-testid="close-menu-button" onClick={close} aria-label={t("nav.closeMenu")}>
                         <XMark />
                       </button>
                     </div>
@@ -91,8 +98,7 @@ const SideMenu = ({ regions }: { regions: HttpTypes.StoreRegion[] | null }) => {
                         />
                       </div>
                       <Text className="flex justify-between txt-compact-small">
-                        © {new Date().getFullYear()} Medusa Store. All rights
-                        reserved.
+                        © {new Date().getFullYear()} {t("nav.storeName")}. {t("footer.allRightsReserved")}.
                       </Text>
                     </div>
                   </div>

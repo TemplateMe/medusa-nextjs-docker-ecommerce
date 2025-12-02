@@ -5,6 +5,7 @@ import Input from "@modules/common/components/input"
 import AccountInfo from "../account-info"
 import { HttpTypes } from "@medusajs/types"
 import { toast } from "@medusajs/ui"
+import { useTranslation } from "@lib/i18n"
 
 type MyInformationProps = {
   customer: HttpTypes.StoreCustomer
@@ -12,6 +13,7 @@ type MyInformationProps = {
 
 const ProfilePassword: React.FC<MyInformationProps> = ({ customer }) => {
   const [successState, setSuccessState] = React.useState(false)
+  const { t } = useTranslation()
 
   // TODO: Add support for password updates
   const updatePassword = async () => {
@@ -29,9 +31,9 @@ const ProfilePassword: React.FC<MyInformationProps> = ({ customer }) => {
       className="w-full"
     >
       <AccountInfo
-        label="Password"
+        label={t("account.password")}
         currentInfo={
-          <span>The password is not shown for security reasons</span>
+          <span>{t("account.passwordNotShown")}</span>
         }
         isSuccess={successState}
         isError={false}
@@ -41,21 +43,21 @@ const ProfilePassword: React.FC<MyInformationProps> = ({ customer }) => {
       >
         <div className="grid grid-cols-2 gap-4">
           <Input
-            label="Old password"
+            label={t("account.oldPassword")}
             name="old_password"
             required
             type="password"
             data-testid="old-password-input"
           />
           <Input
-            label="New password"
+            label={t("account.newPassword")}
             type="password"
             name="new_password"
             required
             data-testid="new-password-input"
           />
           <Input
-            label="Confirm password"
+            label={t("account.confirmPassword")}
             type="password"
             name="confirm_password"
             required

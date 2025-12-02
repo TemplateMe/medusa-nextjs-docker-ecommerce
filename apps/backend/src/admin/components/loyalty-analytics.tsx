@@ -1,6 +1,7 @@
 import { Container, Heading, Text } from "@medusajs/ui"
 import { useQuery } from "@tanstack/react-query"
 import { sdk } from "../lib/sdk"
+import { useTranslation } from "react-i18next"
 
 type AnalyticsData = {
   total_points_issued: number
@@ -9,6 +10,7 @@ type AnalyticsData = {
 }
 
 const LoyaltyAnalytics = () => {
+  const { t } = useTranslation()
   const { data, isLoading } = useQuery<AnalyticsData>({
     queryKey: ["loyalty-analytics"],
     queryFn: () => sdk.client.fetch("/admin/loyalty/analytics", {
@@ -34,11 +36,11 @@ const LoyaltyAnalytics = () => {
   return (
     <Container>
       <div className="p-6">
-        <Heading level="h3" className="mb-4">Loyalty Program Overview</Heading>
+        <Heading level="h3" className="mb-4">{t("loyalty.programOverview")}</Heading>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="p-4 bg-ui-bg-subtle rounded-lg">
             <Text size="small" className="text-ui-fg-subtle mb-1">
-              Total Points Issued
+              {t("loyalty.totalPointsIssued")}
             </Text>
             <Heading level="h2" className="text-ui-fg-base">
               {data?.total_points_issued.toLocaleString() || 0}
@@ -47,7 +49,7 @@ const LoyaltyAnalytics = () => {
           
           <div className="p-4 bg-ui-bg-subtle rounded-lg">
             <Text size="small" className="text-ui-fg-subtle mb-1">
-              Average Points per Customer
+              {t("loyalty.averagePointsPerCustomer")}
             </Text>
             <Heading level="h2" className="text-ui-fg-base">
               {data?.average_points_per_customer.toLocaleString() || 0}
@@ -56,7 +58,7 @@ const LoyaltyAnalytics = () => {
           
           <div className="p-4 bg-ui-bg-subtle rounded-lg">
             <Text size="small" className="text-ui-fg-subtle mb-1">
-              Customers with Points
+              {t("loyalty.customersWithPoints")}
             </Text>
             <Heading level="h2" className="text-ui-fg-base">
               {data?.total_customers_with_points.toLocaleString() || 0}

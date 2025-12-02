@@ -20,10 +20,12 @@ import {
 } from "@medusajs/framework/types"
 import { Calendar, EllipsisHorizontal, Pencil, Plus, XCircle } from "@medusajs/icons"
 import { usePreorderVariant } from "../hooks/use-preorder-variant"
+import { useTranslation } from "react-i18next"
 
 const PreorderWidget = ({ 
   data: variant,
 }: DetailWidgetProps<AdminProductVariant>) => {
+  const { t } = useTranslation()
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
   const [availableDate, setAvailableDate] = useState(
     new Date().toString()
@@ -59,8 +61,8 @@ const PreorderWidget = ({
 
   const handleDisable = async () => {
     const confirmed = await dialog({
-      title: "Are you sure?",
-      description: "This will remove the preorder configuration for this variant. Any existing preorders will not be automatically fulfilled.",
+      title: t("preorder.removeConfiguration"),
+      description: t("preorder.setupDescription"),
       variant: "danger",
     })
     if (confirmed) {
@@ -89,10 +91,10 @@ const PreorderWidget = ({
       <Container className="divide-y p-0">
         <div className="flex items-center justify-between px-6 py-4">
           <div className="flex items-center gap-2">
-            <Heading level="h2">Pre-order</Heading>
+            <Heading level="h2">{t("preorder.title")}</Heading>
             {preorderVariant?.status === "enabled" && (
               <StatusBadge color={"green"}>
-                Enabled
+                {t("common.enabled")}
               </StatusBadge>
             )}
           </div>
@@ -115,7 +117,7 @@ const PreorderWidget = ({
               >
                 { preorderVariant ? <Pencil /> : <Plus />}
                 <span>
-                  { preorderVariant ? "Edit" : "Add" } Pre-order Configuration
+                  { preorderVariant ? t("common.edit") : t("common.add") } {t("preorder.configuration")}
                 </span>
               </DropdownMenu.Item>
               <DropdownMenu.Item
@@ -130,7 +132,7 @@ const PreorderWidget = ({
               >
                 <XCircle />
                 <span>
-                  Remove Pre-order Configuration
+                  {t("preorder.removeConfiguration")}
                 </span>
               </DropdownMenu.Item>
             </DropdownMenu.Content>
@@ -140,23 +142,23 @@ const PreorderWidget = ({
         
         <div className="px-6 py-4">
           {isLoading ? (
-            <Text>Loading pre-order information...</Text>
+            <Text>{t("preorder.loadingInfo")}</Text>
           ) : preorderVariant ? (
             <div className="space-y-3">
               <div className="flex items-center gap-2 text-ui-fg-subtle">
                 <Calendar className="w-4 h-4" />
                 <Text size="small">
-                  Available: {formatDate(preorderVariant.available_date)}
+                  {t("preorder.available")}: {formatDate(preorderVariant.available_date)}
                 </Text>
               </div>
             </div>
           ) : (
             <div className="text-center py-4">
               <Text className="text-ui-fg-subtle">
-                This variant is not configured for pre-order
+                {t("preorder.notConfigured")}
               </Text>
               <Text size="small" className="text-ui-fg-muted mt-1">
-                Set up pre-order configuration to allow customers to order the product variant, then automatically fulfill it when it becomes available.
+                {t("preorder.setupDescription")}
               </Text>
             </div>
           )}
@@ -167,14 +169,14 @@ const PreorderWidget = ({
         <Drawer.Content>
           <Drawer.Header>
             <Drawer.Title>
-              {preorderVariant ? "Edit" : "Add"} Pre-order Configuration
+              {preorderVariant ? t("common.edit") : t("common.add")} {t("preorder.configuration")}
             </Drawer.Title>
           </Drawer.Header>
           
           <Drawer.Body>
             <form onSubmit={handleSubmit} className="flex flex-col gap-4">
               <div className="space-y-2">
-                <Label htmlFor="available-date">Available Date</Label>
+                <Label htmlFor="available-date">{t("preorder.availableDate")}</Label>
                 <DatePicker
                   id="available-date"
                   value={new Date(availableDate)}
@@ -183,7 +185,7 @@ const PreorderWidget = ({
                   isRequired={true}
                 />
                 <Text size="small" className="text-ui-fg-subtle">
-                  Customers can pre-order this variant until this date, when it becomes available for regular purchase.
+                  {t("preorder.availableDateDescription")}
                 </Text>
               </div>
             </form>
@@ -195,14 +197,14 @@ const PreorderWidget = ({
               onClick={() => setIsDrawerOpen(false)}
               disabled={isCreating}
             >
-              Cancel
+              {t("common.cancel")}
             </Button>
             <Button 
               type="submit"
               onClick={handleSubmit}
               isLoading={isCreating}
             >
-              Save
+              {t("common.save")}
             </Button>
           </Drawer.Footer>
         </Drawer.Content>

@@ -16,6 +16,7 @@ import AddToWishlist from "./add-to-wishlist"
 import { Wishlist } from "@lib/data/wishlist"
 import { isPreorderVariant, getPreorderAvailableDate } from "@lib/util/preorder"
 import PreorderBadge from "../preorder-badge"
+import { useTranslation } from "@lib/i18n"
 
 type ProductActionsProps = {
   product: HttpTypes.StoreProduct
@@ -43,6 +44,7 @@ export default function ProductActions({
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
+  const { t } = useTranslation()
 
   const [options, setOptions] = useState<Record<string, string | undefined>>({})
   const [isAdding, setIsAdding] = useState(false)
@@ -206,12 +208,12 @@ export default function ProductActions({
           data-testid="add-product-button"
         >
           {!selectedVariant && !options
-            ? "Select variant"
+            ? t("products.selectVariant")
             : !inStock || !isValidVariant
-            ? "Out of stock"
+            ? t("products.outOfStock")
             : isPreorder
-            ? "Pre-order now"
-            : "Add to cart"}
+            ? t("products.preorderNow")
+            : t("products.addToCart")}
         </Button>
         
         {(selectedVariant || defaultVariant) && (

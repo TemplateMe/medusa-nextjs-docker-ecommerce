@@ -2,16 +2,22 @@ import { getBundlesForProduct } from "@lib/data/bundles"
 import { HttpTypes } from "@medusajs/types"
 import { Heading } from "@medusajs/ui"
 import BundleCard from "@modules/products/components/bundle-card"
+import { getDictionary, createTranslator, getLocaleFromCountry } from "@lib/i18n"
 
 type ProductBundlesSectionProps = {
   productId: string
   region: HttpTypes.StoreRegion
+  countryCode: string
 }
 
 export default async function ProductBundlesSection({
   productId,
   region,
+  countryCode,
 }: ProductBundlesSectionProps) {
+  const locale = getLocaleFromCountry(countryCode)
+  const dictionary = await getDictionary(locale)
+  const t = createTranslator(dictionary)
   const bundles = await getBundlesForProduct(productId, region.id, region.currency_code)
 
   if (!bundles || bundles.length === 0) {
@@ -22,10 +28,10 @@ export default async function ProductBundlesSection({
     <div className="content-container my-16">
       <div className="mb-8">
         <Heading level="h2" className="text-2xl font-medium">
-          Available in Bundles
+          {t("bundles.availableInBundles")}
         </Heading>
         <p className="text-ui-fg-subtle mt-2">
-          Save money by purchasing this product as part of a bundle
+          {t("bundles.saveMoney")}
         </p>
       </div>
       

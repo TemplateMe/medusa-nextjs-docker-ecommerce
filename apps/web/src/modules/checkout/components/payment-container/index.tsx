@@ -10,6 +10,7 @@ import { CardElement } from "@stripe/react-stripe-js"
 import { StripeCardElementOptions } from "@stripe/stripe-js"
 import PaymentTest from "../payment-test"
 import { StripeContext } from "../payment-wrapper/stripe-wrapper"
+import { useTranslation } from "@lib/i18n"
 
 type PaymentContainerProps = {
   paymentProviderId: string
@@ -27,6 +28,18 @@ const PaymentContainer: React.FC<PaymentContainerProps> = ({
   children,
 }) => {
   const isDevelopment = process.env.NODE_ENV === "development"
+  const { t } = useTranslation()
+
+  // Map provider IDs to translation keys
+  const getPaymentTitle = (providerId: string) => {
+    if (providerId.includes("stripe") || providerId.includes("medusa-payments")) {
+      return t("checkout.creditCard")
+    }
+    if (providerId === "pp_system_default") {
+      return t("checkout.manualPayment")
+    }
+    return paymentInfoMap[providerId]?.title || providerId
+  }
 
   return (
     <RadioGroupOption
@@ -45,7 +58,7 @@ const PaymentContainer: React.FC<PaymentContainerProps> = ({
         <div className="flex items-center gap-x-4">
           <Radio checked={selectedPaymentOptionId === paymentProviderId} />
           <Text className="text-base-regular">
-            {paymentInfoMap[paymentProviderId]?.title || paymentProviderId}
+            {getPaymentTitle(paymentProviderId)}
           </Text>
           {isManual(paymentProviderId) && isDevelopment && (
             <PaymentTest className="hidden small:block" />
@@ -79,6 +92,7 @@ export const StripeCardContainer = ({
   setCardComplete: (complete: boolean) => void
 }) => {
   const stripeReady = useContext(StripeContext)
+  const { t } = useTranslation()
 
   const useOptions: StripeCardElementOptions = useMemo(() => {
     return {
@@ -108,7 +122,7 @@ export const StripeCardContainer = ({
         (stripeReady ? (
           <div className="my-4 transition-all duration-150 ease-in-out">
             <Text className="txt-medium-plus text-ui-fg-base mb-1">
-              Enter your card details:
+              {t("checkout.enterCardDetails")}
             </Text>
             <CardElement
               options={useOptions as StripeCardElementOptions}

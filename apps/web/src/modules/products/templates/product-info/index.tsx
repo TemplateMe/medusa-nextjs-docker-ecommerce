@@ -3,12 +3,17 @@ import { Heading, Text } from "@medusajs/ui"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import StarRating from "@modules/products/components/star-rating"
 import { getProductRatingStats } from "@lib/data/reviews"
+import { getDictionary, createTranslator, getLocaleFromCountry } from "@lib/i18n"
 
 type ProductInfoProps = {
   product: HttpTypes.StoreProduct
+  countryCode: string
 }
 
-const ProductInfo = async ({ product }: ProductInfoProps) => {
+const ProductInfo = async ({ product, countryCode }: ProductInfoProps) => {
+  const locale = getLocaleFromCountry(countryCode)
+  const dictionary = await getDictionary(locale)
+  const t = createTranslator(dictionary)
   const ratingStats = await getProductRatingStats(product.id)
 
   return (
@@ -35,13 +40,13 @@ const ProductInfo = async ({ product }: ProductInfoProps) => {
             <StarRating rating={ratingStats.averageRating} size="sm" />
             <span className="text-sm text-gray-600">
               {ratingStats.averageRating.toFixed(1)} ({ratingStats.totalReviews}{" "}
-              review{ratingStats.totalReviews !== 1 ? "s" : ""})
+              {ratingStats.totalReviews !== 1 ? t("reviews.reviews") : t("reviews.review")})
             </span>
             <a
               href="#reviews"
               className="text-sm text-blue-600 hover:underline ml-2"
             >
-              See all reviews
+              {t("reviews.seeAllReviews")}
             </a>
           </div>
         )}

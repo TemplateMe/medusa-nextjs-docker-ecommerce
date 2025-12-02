@@ -4,7 +4,7 @@ import { Metadata } from "next"
 import { notFound } from "next/navigation"
 
 type Props = {
-  params: Promise<{ id: string }>
+  params: Promise<{ id: string; countryCode: string }>
 }
 export const metadata: Metadata = {
   title: "Order Confirmed",
@@ -13,19 +13,20 @@ export const metadata: Metadata = {
 
 export default async function OrderConfirmedPage(props: Props) {
   const params = await props.params
+  const { id, countryCode } = params
   
   let order = null
   try {
-    order = await retrieveOrder(params.id)
+    order = await retrieveOrder(id)
   } catch (error) {
-    console.error("Failed to retrieve order:", params.id, error)
+    console.error("Failed to retrieve order:", id, error)
     return notFound()
   }
 
   if (!order) {
-    console.error("Order not found:", params.id)
+    console.error("Order not found:", id)
     return notFound()
   }
 
-  return <OrderCompletedTemplate order={order} />
+  return <OrderCompletedTemplate order={order} countryCode={countryCode} />
 }
