@@ -203,5 +203,75 @@
     "failed": "Failed",
     "expired": "Expired",
     "active": "Active"
+  },
+
+  "analytics": {
+    "title": "Analytics Dashboard",
+    "subtitle": "Monitor your store performance and key metrics",
+    "routeLabel": "Analytics",
+    "errorLoading": "Failed to load analytics data",
+
+    "tabs": {
+      "overview": "Overview",
+      "orders": "Orders",
+      "customers": "Customers",
+      "products": "Products"
+    },
+
+    "totalRevenue": "Total Revenue",
+    "totalOrders": "Total Orders",
+    "totalCustomers": "Total Customers",
+    "avgOrderValue": "Average Order Value",
+    "allTime": "All time",
+    "registered": "Registered",
+    "perOrder": "Per order",
+
+    "todayStats": "Today's Performance",
+    "ordersToday": "Orders Today",
+    "revenueToday": "Revenue Today",
+    "newCustomersToday": "New Customers Today",
+    "pendingOrders": "Waiting",
+
+    "revenueLast30Days": "Revenue (Last 30 Days)",
+    "ordersLast30Days": "Orders (Last 30 Days)",
+    "ordersByStatus": "Orders by Status",
+    "salesByCurrency": "Sales by Currency",
+    "revenueByRegion": "Revenue by Region",
+
+    "ordersThisWeek": "Orders This Week",
+    "revenueThisWeek": "Revenue This Week",
+    "ordersThisMonth": "Orders This Month",
+    "revenueThisMonth": "Revenue This Month",
+    "completedOrders": "Fulfilled",
+    "canceledOrders": "Canceled Orders",
+    "orderStatusBreakdown": "Order Status Breakdown",
+    "dailyOrderTrend": "Daily Order Trend",
+
+    "orderStatusWaiting": "Waiting",
+    "orderStatusShipped": "Shipped",
+    "orderStatusDelivered": "Delivered",
+    "orderStatusCanceled": "Canceled",
+
+    "returningCustomers": "Returning Customers",
+    "avgOrdersPerCustomer": "Avg Orders/Customer",
+    "avgSpentPerCustomer": "Avg Spent/Customer",
+    "newCustomersThisWeek": "New This Week",
+    "newCustomersThisMonth": "New This Month",
+    "topCustomers": "Top Customers by Revenue",
+    "customer": "Customer",
+    "totalSpent": "Total Spent",
+
+    "totalProducts": "Total Products",
+    "publishedProducts": "Published",
+    "draftProducts": "Draft",
+    "outOfStock": "Out of Stock",
+    "lowStock": "Low Stock",
+    "topSellingProducts": "Top Selling Products",
+    "productName": "Product Name",
+    "unitsSold": "Units Sold",
+    "revenue": "Revenue",
+    "productStatusDistribution": "Product Status Distribution",
+    "published": "Published",
+    "draft": "Draft"
   }
 }

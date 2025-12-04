@@ -203,5 +203,75 @@
     "failed": "Неуспешен",
     "expired": "Изтекъл",
     "active": "Активен"
+  },
+
+  "analytics": {
+    "title": "Аналитично табло",
+    "subtitle": "Наблюдавайте производителността на магазина и ключовите показатели",
+    "routeLabel": "Анализи",
+    "errorLoading": "Неуспешно зареждане на аналитични данни",
+
+    "tabs": {
+      "overview": "Преглед",
+      "orders": "Поръчки",
+      "customers": "Клиенти",
+      "products": "Продукти"
+    },
+
+    "totalRevenue": "Общи приходи",
+    "totalOrders": "Общо поръчки",
+    "totalCustomers": "Общо клиенти",
+    "avgOrderValue": "Средна стойност на поръчка",
+    "allTime": "Общо",
+    "registered": "Регистрирани",
+    "perOrder": "На поръчка",
+
+    "todayStats": "Днешно представяне",
+    "ordersToday": "Поръчки днес",
+    "revenueToday": "Приходи днес",
+    "newCustomersToday": "Нови клиенти днес",
+    "pendingOrders": "Изчакващи",
+
+    "revenueLast30Days": "Приходи (последни 30 дни)",
+    "ordersLast30Days": "Поръчки (последни 30 дни)",
+    "ordersByStatus": "Поръчки по статус",
+    "salesByCurrency": "Продажби по валута",
+    "revenueByRegion": "Приходи по регион",
+
+    "ordersThisWeek": "Поръчки тази седмица",
+    "revenueThisWeek": "Приходи тази седмица",
+    "ordersThisMonth": "Поръчки този месец",
+    "revenueThisMonth": "Приходи този месец",
+    "completedOrders": "Изпълнени",
+    "canceledOrders": "Отменени поръчки",
+    "orderStatusBreakdown": "Разбивка по статус на поръчки",
+    "dailyOrderTrend": "Дневна тенденция на поръчки",
+
+    "orderStatusWaiting": "Изчакващи",
+    "orderStatusShipped": "Изпратени",
+    "orderStatusDelivered": "Доставени",
+    "orderStatusCanceled": "Отменени",
+
+    "returningCustomers": "Завръщащи се клиенти",
+    "avgOrdersPerCustomer": "Ср. поръчки/клиент",
+    "avgSpentPerCustomer": "Ср. разход/клиент",
+    "newCustomersThisWeek": "Нови тази седмица",
+    "newCustomersThisMonth": "Нови този месец",
+    "topCustomers": "Топ клиенти по приходи",
+    "customer": "Клиент",
+    "totalSpent": "Общо похарчено",
+
+    "totalProducts": "Общо продукти",
+    "publishedProducts": "Публикувани",
+    "draftProducts": "Чернови",
+    "outOfStock": "Изчерпани",
+    "lowStock": "Ниска наличност",
+    "topSellingProducts": "Най-продавани продукти",
+    "productName": "Име на продукт",
+    "unitsSold": "Продадени бройки",
+    "revenue": "Приходи",
+    "productStatusDistribution": "Разпределение по статус на продукти",
+    "published": "Публикувани",
+    "draft": "Чернови"
   }
 }

@@ -1,5 +1,5 @@
 // Supported locales
-export const locales = ["en", "bg"] as const
+export const locales = ["en", "bg", "it"] as const
 export type Locale = (typeof locales)[number]
 
 // Default locale fallback
@@ -10,6 +10,9 @@ export const defaultLocale: Locale = "en"
 export const countryToLocaleMap: Record<string, Locale> = {
   // Bulgarian locale
   bg: "bg",
+  
+  // Italian locale
+  it: "it",
   
   // English locale (default for most countries)
   us: "en",
@@ -31,7 +34,6 @@ export const countryToLocaleMap: Record<string, Locale> = {
   // European countries default to English unless specified
   de: "en",
   fr: "en",
-  it: "en",
   es: "en",
   nl: "en",
   be: "en",
@@ -99,6 +101,7 @@ export function getLanguageName(locale: Locale): string {
   const names: Record<Locale, string> = {
     en: "English",
     bg: "Български",
+    it: "Italiano",
   }
   return names[locale]
 }

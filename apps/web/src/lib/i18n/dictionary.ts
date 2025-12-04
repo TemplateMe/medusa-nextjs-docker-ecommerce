@@ -4,6 +4,7 @@ import { Locale, defaultLocale, isValidLocale } from "./config"
 const dictionaries: Record<Locale, () => Promise<Record<string, any>>> = {
   en: () => import("./locales/en.json").then((module) => module.default),
   bg: () => import("./locales/bg.json").then((module) => module.default),
+  it: () => import("./locales/it.json").then((module) => module.default),
 }
 
 /**
