@@ -3,16 +3,16 @@ services:
   # This service runs the Next.js web application in development mode
   web:
     build:
-      context: ./apps/web
+      context: ../../apps/web
       dockerfile: Dockerfile
     container_name: nextjs_web
     restart: unless-stopped
     ports:
       - "8000:8000"
     env_file:
-      - ./apps/web/.env
+      - ../../apps/web/.env
     volumes:
-      - ./apps/web:/app
+      - ../../apps/web:/app
       - /app/node_modules
       - /app/.next
     networks:

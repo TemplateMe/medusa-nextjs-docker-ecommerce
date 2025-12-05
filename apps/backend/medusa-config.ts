@@ -3,7 +3,15 @@ import { loadEnv, defineConfig, Modules, ContainerRegistrationKeys } from '@medu
 loadEnv(process.env.NODE_ENV || 'development', process.cwd())
 
 module.exports = defineConfig({
+  admin: {
+    disable: process.env.ADMIN_DISABLED === "true" ||
+      false,
+  },
   projectConfig: {
+    workerMode: (["shared", "worker", "server"].includes(process.env.WORKER_MODE as string) 
+      ? process.env.WORKER_MODE 
+      : "shared"
+    ) as "shared" | "worker" | "server",
     databaseUrl: process.env.DATABASE_URL,
     http: {
       storeCors: process.env.STORE_CORS!,
@@ -15,6 +23,12 @@ module.exports = defineConfig({
     databaseDriverOptions: {
       ssl: false,
       sslmode: "disable",
+    },
+    // cookieOptions block is added so when the deployed app is tested locally to be accessable. 
+    // When deploying to production with the domain make sure to remove it
+    cookieOptions: {
+      sameSite: "lax",
+      secure: false,
     },
   },
   modules: [

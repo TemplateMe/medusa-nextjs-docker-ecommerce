@@ -1,0 +1,165 @@
+# By default Docker Compose looks for .env in the same directory
+# where you run docker compose where docker-compose.yml is.
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: database
+    restart: unless-stopped
+
+    ports:
+      - "${POSTGRES_PORT}:5432"
+    
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      # Optional: initialization scripts
+      # Anything in this folder will run on first startup
+      # - ./initdb:/docker-entrypoint-initdb.d:ro
+    
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    
+    # Resource limits (tune for your host)
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"    # 2 CPUs
+          memory: 4G     # 4 GB RAM
+        reservations:
+          cpus: "0.5"    # 0.5 CPU guaranteed
+          memory: 512M   # 512 MB guaranteed
+    
+    networks:
+      - medusa_ecommerce_network
+
+  # Redis
+  redis:
+    image: redis:7-alpine
+    container_name: cache
+    restart: unless-stopped
+
+    ports:
+      - "${REDIS_PORT}:6379"
+
+    healthcheck:
+      test: ["CMD", "redis-cli", "PING"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+    deploy:
+      resources:
+        limits:
+          cpus: "0.50"   # 0.5 CPU
+          memory: 512M   # 512 MB RAM
+        reservations:
+          cpus: "0.10"   # 0.1 CPU guaranteed
+          memory: 128M   # 128 MB guaranteed
+    
+    networks:
+      - medusa_ecommerce_network
+
+  # MinIO Object Storage
+  minio:
+    image: minio/minio:RELEASE.2025-09-07T16-13-09Z
+    container_name: files
+    restart: unless-stopped
+
+    ports:
+      - "${MINIO_API_PORT}:9000"  # MinIO API
+      - "${MINIO_CONSOLE_PORT}:9002"  # MinIO Console (Web UI)
+    
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      # Optional, if you expose behind a domain / HTTPS proxy:
+      # MINIO_SERVER_URL: "https://minio.example.com"
+      # MINIO_BROWSER_REDIRECT_URL: "https://console.minio.example.com"
+    
+    command: server /data --console-address ":9002"
+
+    volumes:
+      - minio_data:/data
+    
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 20s
+
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"   # 1 CPU
+          memory: 2G    # 2 GB RAM
+        reservations:
+          cpus: "0.25"  # 0.25 CPU guaranteed
+          memory: 512M  # 512 MB guaranteed
+
+    networks:
+      - medusa_ecommerce_network
+
+  # Meilisearch
+  meilisearch:
+    image: getmeili/meilisearch:v1.16
+    container_name: search_engine
+    restart: unless-stopped
+
+    ports:
+      - "${MEILI_PORT}:7700"
+    
+    environment:
+      MEILI_ENV: production
+      MEILI_MASTER_KEY: ${MEILI_MASTER_KEY}
+      MEILI_NO_ANALYTICS: true
+      MEILI_NO_SENTRY: true
+    
+    volumes:
+      - meilisearch_data:/meili_data
+
+    command: >
+      meilisearch
+      --db-path /meili_data
+      --env production
+    
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:7700/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"   # 1 CPU
+          memory: 1G    # 1 GB RAM
+        reservations:
+          cpus: "0.25"  # 0.25 CPU guaranteed
+          memory: 256M  # 256 MB guaranteed
+    
+    networks:
+      - medusa_ecommerce_network
+
+volumes:
+  postgres_data:
+    driver: local
+  minio_data:
+    driver: local
+  meilisearch_data:
+    driver: local
+
+networks:
+  medusa_ecommerce_network:
+    driver: bridge

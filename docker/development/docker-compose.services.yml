@@ -48,67 +48,32 @@ services:
       timeout: 20s
       retries: 3
 
-  # Medusa Server
-  # This service runs the Medusa backend application
-  # and the admin dashboard.
-  medusa:
-    build:
-      context: ./apps/backend
-      dockerfile: Dockerfile
-    container_name: medusa_backend
+  # Meilisearch
+  # Fast, typo-tolerant search engine for product search
+  meilisearch:
+    image: getmeili/meilisearch:v1.11
+    container_name: medusa_meilisearch
     restart: unless-stopped
-    depends_on:
-      - postgres
-      - redis
-      - minio
-    ports:
-      - "9000:9000"
     environment:
-      - NODE_ENV=development
-      - DATABASE_URL=postgres://postgres:postgres@postgres:5432/medusa-store
-      - REDIS_URL=redis://redis:6379
-      - MINIO_ENDPOINT=http://minio:9000
-      - MINIO_ACCESS_KEY=minioadmin
-      - MINIO_SECRET_KEY=minioadmin
-      - MINIO_BUCKET=medusa-uploads
-      - MINIO_REGION=eu-central-1
-    env_file:
-      - ./apps/backend/.env
+      MEILI_MASTER_KEY: mK8vQ7nX2pL9wR4tY6hU3jN5mB8cD1fG
+      MEILI_ENV: production
+    ports:
+      - "7700:7700"
     volumes:
-      - ./apps/backend:/server
-      - /server/node_modules
+      - meilisearch_data:/meili_data
     networks:
       - medusa_network
-
-  # Next.js Frontend
-  # This service runs the Next.js web application in development mode
-  web:
-    build:
-      context: ./apps/web
-      dockerfile: Dockerfile
-    container_name: nextjs_web
-    restart: unless-stopped
-    depends_on:
-      - medusa
-    ports:
-      - "8000:8000"
-    environment:
-      - NODE_ENV=development
-      # Override backend URL to use Docker network
-      - NEXT_PUBLIC_MEDUSA_BACKEND_URL=http://medusa:9000
-      - MEDUSA_BACKEND_URL=http://medusa:9000
-    env_file:
-      - ./apps/web/.env
-    volumes:
-      - ./apps/web:/app
-      - /app/node_modules
-      - /app/.next
-    networks:
-      - medusa_network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--spider", "http://localhost:7700/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
 
 volumes:
   postgres_data:
   minio_data:
+  meilisearch_data:
 
 networks:
   medusa_network:
